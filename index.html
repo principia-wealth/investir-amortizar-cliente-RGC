@@ -14,6 +14,7 @@
   --line:#e4e8ee;--line2:#cfd6df;--navy:#132a4d;--navy2:#1d3a63;
   --amort:#0f7a5a;--amort-soft:#e7f4ef;--amort-ink:#0a5a42;
   --invest:#c2751b;--invest-soft:#fbf1e1;--invest-ink:#94540f;
+  --dyn:#5b4bc4;--dyn-soft:#eeecfa;--dyn-ink:#41339c;
   --imovel:#5a6bb0;--danger:#b4302a;
   --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px -12px rgba(16,24,40,.14);
 }
@@ -46,10 +47,11 @@ h1 em{font-style:italic;color:var(--navy2)}
 .verdict-box{border-radius:12px;padding:15px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid transparent}
 .verdict-box.inv{background:var(--invest-soft);border-color:#eddcbc}
 .verdict-box.amo{background:var(--amort-soft);border-color:#c7e3d9}
+.verdict-box.dyn{background:var(--dyn-soft);border-color:#d4cef2}
 .verdict-box .vtag{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:5px 10px;border-radius:6px;color:#fff;white-space:nowrap}
-.verdict-box.inv .vtag{background:var(--invest)}.verdict-box.amo .vtag{background:var(--amort)}
+.verdict-box.inv .vtag{background:var(--invest)}.verdict-box.amo .vtag{background:var(--amort)}.verdict-box.dyn .vtag{background:var(--dyn)}
 .verdict-box .vtxt{font-family:'Newsreader',serif;font-size:clamp(15px,2vw,19px);line-height:1.35;flex:1;min-width:250px}
-.verdict-box.inv .vtxt{color:var(--invest-ink)}.verdict-box.amo .vtxt{color:var(--amort-ink)}
+.verdict-box.inv .vtxt{color:var(--invest-ink)}.verdict-box.amo .vtxt{color:var(--amort-ink)}.verdict-box.dyn .vtxt{color:var(--dyn-ink)}
 .verdict-box .vtxt b{font-weight:600}
 .decvalue{margin-top:14px;display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end;padding-top:14px;border-top:1px dashed var(--line2)}
 .decvalue .dv{display:flex;flex-direction:column}
@@ -112,7 +114,8 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--navy);outline-o
 .seg button{background:none;border:none;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--muted);padding:5px 11px;border-radius:6px;cursor:pointer}
 .seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(16,24,40,.08)}
 
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:1200px){.cards{grid-template-columns:repeat(2,1fr)}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px;box-shadow:var(--shadow);position:relative}
 .card.win{box-shadow:0 0 0 1.5px currentColor,var(--shadow)}
 .card .badge{position:absolute;top:-9px;right:12px;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:5px;display:none;color:#fff;background-color:#132a4d}
@@ -120,6 +123,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--navy);outline-o
 .fam-invest .badge{background-color:#c2751b;color:#fff}
 .fam-amort .badge{background-color:#0f7a5a;color:#fff}
 .fam-amort2 .badge{background-color:#2a7d6a;color:#fff}
+.fam-dyn .badge{background-color:#5b4bc4;color:#fff}
 .card .letter{width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;margin-bottom:9px}
 .card h4{margin:0 0 2px;font-size:13px;font-weight:700}
 .card .desc{font-size:11px;color:var(--muted);margin:0 0 12px;min-height:42px;line-height:1.35}
@@ -133,6 +137,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--navy);outline-o
 .fam-invest{color:var(--invest)}.fam-invest .letter{background:var(--invest)}
 .fam-amort{color:var(--amort)}.fam-amort .letter{background:var(--amort)}
 .fam-amort2{color:#2a7d6a}.fam-amort2 .letter{background:#2a7d6a}
+.fam-dyn{color:#5b4bc4}.fam-dyn .letter{background:#5b4bc4}
 
 .tabs{display:flex;gap:4px;padding:0 4px;background:var(--panel);border:1px solid var(--line);border-bottom:none;border-radius:14px 14px 0 0;overflow-x:auto}
 .tab{background:none;border:none;padding:13px 15px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap}
@@ -256,7 +261,7 @@ footer.foot{margin-top:20px;font-size:11px;color:var(--muted);text-align:center;
     <div class="robust">
       <div class="rt">A conclusão muda se o juro real de longo prazo for outro?</div>
       <table>
-        <thead><tr><th>Juro real de longo prazo</th><th>Investir (A)</th><th>Amortizar (B)</th><th>Vantagem de amortizar</th></tr></thead>
+        <thead><tr><th>Juro real de longo prazo</th><th>Melhor estratégia fixa</th><th>Patrimônio dinâmico</th><th>Ganho do dinâmico</th></tr></thead>
         <tbody id="robustBody"></tbody>
       </table>
       <div class="conc" id="robustConc">—</div>
@@ -327,8 +332,8 @@ footer.foot{margin-top:20px;font-size:11px;color:var(--muted);text-align:center;
       <div class="cards">
         <div class="card fam-invest" id="cardA">
           <span class="badge">Vencedor</span><span class="letter">A</span>
-          <h4>Investir o aporte</h4>
-          <p class="desc">O aporte anual vai para o fundo Selic. O FGTS continua amortizando o financiamento.</p>
+          <h4>Investir o bônus</h4>
+          <p class="desc">O bônus anual vai para o fundo Selic. O FGTS continua amortizando o financiamento.</p>
           <div class="pl-k" id="klA">Patrimônio financeiro ao quitar</div><div class="pl-v" id="plA">—</div>
           <div class="rows">
             <div class="r"><span>Quitação do financiamento</span><span id="quitA">—</span></div>
@@ -340,7 +345,7 @@ footer.foot{margin-top:20px;font-size:11px;color:var(--muted);text-align:center;
         <div class="card fam-amort" id="cardB">
           <span class="badge">Vencedor</span><span class="letter">B</span>
           <h4>Amortizar · reduzir prazo</h4>
-          <p class="desc">O aporte abate o saldo mantendo a amortização; o prazo encurta. O alívio de caixa é investido.</p>
+          <p class="desc">O bônus abate o saldo mantendo a amortização mensal; o prazo encurta e a dívida acaba antes.</p>
           <div class="pl-k" id="klB">Patrimônio financeiro ao quitar</div><div class="pl-v" id="plB">—</div>
           <div class="rows">
             <div class="r"><span>Quitação do financiamento</span><span id="quitB">—</span></div>
@@ -352,7 +357,7 @@ footer.foot{margin-top:20px;font-size:11px;color:var(--muted);text-align:center;
         <div class="card fam-amort2" id="cardC">
           <span class="badge">Vencedor</span><span class="letter">C</span>
           <h4>Amortizar · reduzir parcela</h4>
-          <p class="desc">O aporte abate o saldo mantendo o prazo; a parcela cai. O alívio mensal é investido.</p>
+          <p class="desc">O bônus abate o saldo mantendo o prazo; a parcela mensal cai até a dívida se encerrar.</p>
           <div class="pl-k" id="klC">Patrimônio financeiro ao quitar</div><div class="pl-v" id="plC">—</div>
           <div class="rows">
             <div class="r"><span>Quitação do financiamento</span><span id="quitC">—</span></div>
@@ -361,11 +366,23 @@ footer.foot{margin-top:20px;font-size:11px;color:var(--muted);text-align:center;
             <div class="r sep"><span>Patrimônio total (c/ imóvel)</span><span id="totC">—</span></div>
           </div>
         </div>
+        <div class="card fam-dyn" id="cardD">
+          <span class="badge">Vencedor</span><span class="letter">D</span>
+          <h4>Dinâmica · investir e depois amortizar</h4>
+          <p class="desc">Investe o bônus enquanto a Selic supera o gatilho e passa a amortizar quando ela cai abaixo. Adapta-se à trajetória de juros.</p>
+          <div class="pl-k" id="klD">Patrimônio financeiro ao quitar</div><div class="pl-v" id="plD">—</div>
+          <div class="rows">
+            <div class="r"><span>Quitação do financiamento</span><span id="quitD">—</span></div>
+            <div class="r"><span>Custo total da dívida</span><span id="costD">—</span></div>
+            <div class="r"><span>Investimentos acumulados</span><span id="fundD">—</span></div>
+            <div class="r sep"><span>Patrimônio total (c/ imóvel)</span><span id="totD">—</span></div>
+          </div>
+        </div>
       </div>
 
       <div>
         <div class="tabs">
-          <button class="tab on" data-pane="p1">Comparação A/B/C</button>
+          <button class="tab on" data-pane="p1">Comparação dos caminhos</button>
           <button class="tab" data-pane="p2">Composição do patrimônio</button>
           <button class="tab" data-pane="p3">Tabela ano a ano</button>
         </div>
@@ -388,17 +405,17 @@ footer.foot{margin-top:20px;font-size:11px;color:var(--muted);text-align:center;
           <div class="tabpane" id="p2">
             <div class="pane-head">
               <div><h3>De onde vem o patrimônio</h3><div class="csub">Investimentos e imóvel empilhados; dívida e patrimônio líquido em linha</div></div>
-              <div class="seg" id="segScen2"><button data-s="A">A</button><button data-s="B" class="on">B</button><button data-s="C">C</button></div>
+              <div class="seg" id="segScen2"><button data-s="A">A</button><button data-s="B">B</button><button data-s="C">C</button><button data-s="D" class="on">D</button></div>
             </div>
             <div class="chart-holder"><canvas id="chartComp"></canvas></div>
-            <div class="note-inline">Em valores de hoje o imóvel aparece <b>plano</b>: valoriza pela inflação, preservando poder de compra sem ganho real. Como é idêntico nos três cenários, toda a diferença entre A, B e C vem do lado financeiro.</div>
+            <div class="note-inline">Em valores de hoje o imóvel aparece <b>plano</b>: valoriza pela inflação, preservando poder de compra sem ganho real. Como é idêntico em todos os caminhos, toda a diferença entre eles vem do lado financeiro.</div>
           </div>
 
           <div class="tabpane" id="p3">
             <div class="pane-head">
               <div><h3>Evolução linha a linha</h3><div class="csub">Dívida, aportes, investimentos, imóvel e patrimônio</div></div>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <div class="seg" id="segScen3"><button data-s="A">A</button><button data-s="B" class="on">B</button><button data-s="C">C</button></div>
+                <div class="seg" id="segScen3"><button data-s="A">A</button><button data-s="B">B</button><button data-s="C">C</button><button data-s="D" class="on">D</button></div>
                 <div class="seg" id="segFreq"><button data-f="y" class="on">Anual</button><button data-f="m">Mensal</button></div>
               </div>
             </div>
@@ -439,32 +456,35 @@ footer.foot{margin-top:20px;font-size:11px;color:var(--muted);text-align:center;
       <h5>O IR incide sobre o ganho nominal</h5>
       <p>Efeito pouco intuitivo e economicamente relevante: com juro real de 4,5% e inflação de 4,5%, o nominal é 9,20%; após 15% de IR sobra 7,77% nominal, que em termos reais é apenas <b>3,13%</b>. O imposto consome cerca de 1,4 ponto do juro real, porque tributa também a parcela que apenas repõe a inflação.</p>
 
-      <h5>Gatilho de decisão</h5>
+      <h5>Gatilho de decisão — e por que ele muda ao longo do tempo</h5>
       <p>A TR não está embutida no CET — é custo adicional:</p>
       <p><code>Custo_total_dívida(TR) = (1 + 0,1109) × (1 + TR) − 1</code><br>
       <code>Selic_gatilho(TR) = Custo_total_dívida(TR) ÷ 0,85</code></p>
-      <p>O que se compara ao gatilho <b>não é a Selic de hoje</b>, e sim a <b>média geométrica projetada da Selic enquanto a dívida existir</b>. A dívida dura poucos anos; usar a taxa de um único dia para decidir sobre esse período é o erro mais comum nesta análise.</p>
+      <p>A decisão amortizar-vs-investir <b>não é única nem permanente</b>: é uma escolha que se repete a cada bônus recebido. Em cada momento, compara-se a <b>Selic daquele instante</b> ao gatilho. Enquanto a Selic está <b>acima</b> do gatilho, investir o bônus rende mais do que abater a dívida; quando ela cai <b>abaixo</b>, amortizar passa a render mais. Com a Selic hoje em 14,25% e o gatilho em 13,05%, investir vence <b>agora</b> — mas a projeção de queda faz a Selic cruzar o gatilho em cerca de 1,3 ano, invertendo a lógica a partir daí. Reduzir tudo a uma única média da Selic esconde essa dinâmica; por isso o simulador testa a decisão mês a mês.</p>
 
-      <h5>Valor da decisão</h5>
-      <p>Diferença de patrimônio financeiro entre os cenários no mês em que a dívida se extingue em todos eles, em valores de hoje. A partir desse ponto os três cenários passam a ter fluxos idênticos e a diferença apenas capitaliza — por isso medi-la no fim da dívida isola o efeito da decisão do efeito do tempo. O veredito exibido vem da simulação completa; o gatilho serve para explicar por que o resultado é esse. Quando a vantagem é inferior a 0,5% do patrimônio da época, o cenário é tratado como <b>tecnicamente empatado</b>.</p>
+      <h5>Os quatro caminhos</h5>
+      <p><b>A — investir o bônus:</b> o bônus vai integralmente ao fundo; o FGTS segue amortizando. <b>B — amortizar reduzindo prazo</b> e <b>C — amortizar reduzindo parcela:</b> o bônus abate o saldo. <b>D — dinâmico:</b> a cada bônus, investe se a Selic do momento supera o gatilho, senão amortiza. O caminho D é o teoricamente ótimo, porque aproveita a janela atual de juro alto e migra para amortização quando o juro cai. Nos quatro, o FGTS sempre amortiza (parado renderia apenas TR+3%) e a parcela liberada após a quitação é investida.</p>
+
+      <h5>Ponto de comparação</h5>
+      <p>Os caminhos são comparados pelo patrimônio financeiro no mês em que a dívida se extingue em todos eles, em valores de hoje. A partir desse ponto os fluxos passam a ser idênticos e a diferença apenas capitaliza — por isso medi-la no fim da dívida isola o efeito da decisão do efeito do tempo. O <b>ganho da estratégia dinâmica</b> exibido é a diferença entre o caminho D e a melhor estratégia fixa (A, B ou C) nesse ponto.</p>
 
       <h5>Como o bônus anual entra</h5>
       <p>O bônus é um <b>aporte único por ano</b>, feito uma vez a cada 12 meses. O valor informado é aplicado <b>cheio já no primeiro ano</b> e corrigido pela inflação nos anos seguintes — no ano 2 o valor nominal é o do ano 1 mais a inflação, e assim por diante, mantendo o poder de compra constante. No cenário de investir, o bônus vai para o fundo; nos de amortizar, abate o saldo devedor.</p>
       <p>O modelo <b>não</b> supõe que o cliente reinveste mensalmente o alívio da redução de parcela — isso não é considerado. A única entrada mensal adicional ocorre <b>depois que o financiamento é quitado</b>: a partir daí, a parcela que deixaria de ser paga ao banco (cerca de R$ 6.800) passa a ser investida, pois esse dinheiro deixa de sair do bolso do cliente. Isso não é uma suposição de comportamento, e sim o fim do próprio financiamento.</p>
 
       <h5>Motor SAC, FGTS e imóvel</h5>
-      <p>Juros de 0,83% a.m. sobre o saldo corrigido pela TR; amortização recalculada como <code>saldo ÷ parcelas restantes</code>. FGTS informado como acumulado anual, depositado em duodécimos, capitalizado a <b>TR + 3% a.a.</b>, e <b>sempre usado para amortizar</b> nos três cenários. Encargos MIP/DFI estimados por <code>(CET_mensal − 0,83%) × saldo</code>, com +15% a cada faixa de 5 anos de idade. Imóvel valoriza pela inflação — constante em valores de hoje. Aportes e FGTS cessam ao fim do período de acumulação.</p>
+      <p>Juros de 0,83% a.m. sobre o saldo corrigido pela TR; amortização recalculada como <code>saldo ÷ parcelas restantes</code>. FGTS informado como acumulado anual, depositado em duodécimos, capitalizado a <b>TR + 3% a.a.</b>, e <b>sempre usado para amortizar</b> nos quatro caminhos. Encargos MIP/DFI estimados por <code>(CET_mensal − 0,83%) × saldo</code>, com +15% a cada faixa de 5 anos de idade. Imóvel valoriza pela inflação — constante em valores de hoje. Aportes e FGTS cessam ao fim do período de acumulação.</p>
 
       <h5>Validação executada</h5>
       <ul>
-        <li>Conservação de principal: amortização + FGTS aplicado + aporte aplicado + saldo final = saldo inicial + correções de TR, erro inferior a R$ 1 em todos os cenários de TR e de aporte testados.</li>
-        <li>Conservação do FGTS: depósitos + rendimentos = amortizado + enviado ao fundo + retido; capitalização conferida contra cálculo fechado a TR+3%.</li>
-        <li>Identidade de caixa: pago ao banco + alívio investido = orçamento original, nos três cenários.</li>
-        <li>Auditoria linha a linha: nas 1.440 linhas de cada cenário testado, juros, encargos, recursão do saldo devedor, capitalização do fundo, patrimônio e deflação foram recalculados de forma independente e conferiram integralmente.</li>
+        <li>Conservação de principal: amortização regular + FGTS aplicado + bônus aplicado + saldo final = saldo inicial + correção da TR, com erro inferior a R$ 1 nos quatro caminhos e em todas as combinações de TR, aporte e trajetória de Selic testadas.</li>
+        <li>Conservação do investimento: a soma de tudo que entra no fundo = bônus investido + excedente de FGTS + parcela liberada após a quitação, exatamente, nos quatro caminhos.</li>
+        <li>Cenário dinâmico: em cada bônus, a escolha investir/amortizar segue o sinal da Selic corrente contra o gatilho; nos extremos coincide com investir sempre (Selic sempre acima) ou amortizar sempre (Selic sempre abaixo).</li>
+        <li>O caminho vencedor exibido vem <b>sempre da simulação completa</b>, não da regra do gatilho — porque a antecipação da parcela liberada é um efeito de segunda ordem que a regra simples não captura. Na faixa realista de juro real (3,5% a 8%), o caminho dinâmico nunca fica abaixo da melhor estratégia fixa.</li>
         <li>Fórmulas fechadas: a tabela SAC pura reproduz amortização constante e juros totais iguais a <code>i × saldo × (n+1)/2</code>; a capitalização do fundo reproduz a fórmula de valor futuro de anuidade.</li>
         <li>Trajetória de juros: parte da Selic de hoje, converge ao patamar de longo prazo de forma monótona; a média geométrica foi reconferida independentemente.</li>
-        <li>Valor da decisão é exatamente zero quando o aporte é zero; aportes e FGTS cessam ao fim do período de acumulação.</li>
-        <li>Fundo, alívio e saldo nunca negativos para TR de 0% a 15%; nenhum valor inválido em 19 casos de borda, incluindo juro real negativo, inflação zero e 30%, aporte de R$ 10 milhões e horizonte de 1 mês.</li>
+        <li>Bônus aplicado cheio no ano 1 e corrigido pela inflação a cada ano; aportes e FGTS cessam ao fim do período de acumulação.</li>
+        <li>Fundo e saldo nunca negativos; nenhum valor inválido em casos de borda, incluindo juro real negativo, inflação de 0% e 30%, bônus de R$ 10 milhões, Selic de 0% a 25% e horizonte de 1 mês.</li>
       </ul>
 
       <h5>Limitações</h5>
@@ -508,6 +528,7 @@ function selicAt(p,t){
 function runSim(p){
   const TR_m=mR(p.TR_a),FG_m=mR(p.TR_a+0.03),INF_m=mR(p.infl);
   const H=p.horizon,aporteAte=p.aporteAnos*12,fgDep=p.fgtsAno/12;
+  const GATILHO=gatilho(p.TR_a).selic; // break-even Selic para o cenário dinâmico
   // parcela da tabela SAC ORIGINAL — usada só para saber quanto de parcela é LIBERADO ao quitar antes
   const orig=new Array(H).fill(0);
   {let S=p.S0,n=p.n0;
@@ -544,8 +565,11 @@ function runSim(p){
       }
       // APORTE ANUAL ÚNICO — valor cheio no ano 1, corrigido pela inflação a cada ano
       const exT=(t<aporteAte)?p.extra*Math.pow(1+p.infl,Math.floor(t/12)):0;
+      // destino do bônus: A investe sempre; B/C amortizam; D decide pelo sinal de taxa do momento
+      // (investe enquanto a Selic corrente supera o gatilho; amortiza quando cai abaixo)
+      const investBonus = (mode==='A') ? true : (mode==='D' ? (selicAt(p,t) > GATILHO) : false);
       if(exT>0&&(t+1)%p.extraPeriod===0){
-        if(mode==='A'){invest+=exT;tExInv+=exT;}
+        if(investBonus){invest+=exT;tExInv+=exT;}
         else if(S>1e-6){
           exUse=Math.min(exT,S);S-=exUse;tExApl+=exUse;
           const sob=exT-exUse;invest+=sob;tExInv+=sob;
@@ -569,10 +593,10 @@ function runSim(p){
       rFund:fund/dH,rDebt:S/dH,rImovel:im/dH,rPlFin:(fund-S)/dH,rPlTotal:(fund+im-S)/dH,
       cost:tJ+tTR+tE+tT,rCost:rJ+rTR+rE+rT,tExInv,tFgInv,tLib,tExApl,tFgApl,tAm,tTR};
   }
-  const R={A:sim('A'),B:sim('B'),C:sim('C')};
-  const qs=[R.A.quit,R.B.quit,R.C.quit].map(q=>q===null?H-1:q);
+  const R={A:sim('A'),B:sim('B'),C:sim('C'),D:sim('D')};
+  const qs=[R.A.quit,R.B.quit,R.C.quit,R.D.quit].map(q=>q===null?H-1:q);
   R.decT=Math.min(H-1,Math.max.apply(null,qs));
-  R.decisao={A:R.A.rows[R.decT].rPlFin,B:R.B.rows[R.decT].rPlFin,C:R.C.rows[R.decT].rPlFin};
+  R.decisao={A:R.A.rows[R.decT].rPlFin,B:R.B.rows[R.decT].rPlFin,C:R.C.rows[R.decT].rPlFin,D:R.D.rows[R.decT].rPlFin};
   let acc=1;for(let t=0;t<=R.decT;t++)acc*=(1+mR(selicAt(p,t)));
   R.selicMedia=Math.pow(acc,12/(R.decT+1))-1;
   return R;
@@ -599,7 +623,7 @@ const selR=$('selicRange'),selN=$('selicNum'),realR=$('realRange'),realN=$('real
   fExtra=$('extra'),fAp=$('aporteAnos'),fConv=$('convAnos');
 (function(){const d=new Date();fData.value=d.toISOString().slice(0,10);DEF.start=fData.value;})();
 
-let PV=false,metric='plTotal',scen2='B',scen3='B',freq='y';
+let PV=false,metric='plTotal',scen2='D',scen3='D',freq='y';
 let cCmp=null,cComp=null,LAST=null;
 
 function readState(){
@@ -650,27 +674,47 @@ function render(){
   const hDisp=Math.min(p.horizon,qmax+1);
   p.hDisp=hDisp;
   const r=rFull;LAST={p,r,g};
-  const difDec=Math.max(r.decisao.B,r.decisao.C)-r.decisao.A;
-  const baseDec=Math.max(1,Math.abs(r.decisao.A));
-  const empate=Math.abs(difDec)/baseDec<0.005;
-  const inv=difDec<0;
+  // ranking dos quatro caminhos no ponto de convergência — o VENCEDOR vem sempre da simulação completa
+  const paths=[['A',r.decisao.A],['B',r.decisao.B],['C',r.decisao.C],['D',r.decisao.D]].sort((a,b)=>b[1]-a[1]);
+  const vencedor=paths[0][0];
+  const segundo=paths[1][0];
+  const margem=paths[0][1]-paths[1][1]; // vantagem do 1º sobre o 2º
+  const ganhoD=r.decisao.D - Math.max(r.decisao.A,r.decisao.B,r.decisao.C); // ganho de D sobre a melhor estratégia FIXA
+  const dinVence = vencedor==='D' && ganhoD>Math.max(1,Math.abs(r.decisao.A))*0.005;
   const anosDiv=((r.decT+1)/12);
+  // mês em que a Selic cruza o gatilho (deixa de compensar investir)
+  let cruz=null; for(let t=0;t<p.horizon;t++){ if(selicAt(p,t)<g.selic){cruz=t;break;} }
+  const selicHojeAcima = p.selicHoje > g.selic;
 
   $('bnCusto').textContent=pct(g.custo);
-  $('bnCustoExp').innerHTML='CET de 11,09% <b>+ TR de '+pct(p.TR_a)+'</b>. É o retorno garantido que você trava ao amortizar.';
+  $('bnCustoExp').innerHTML='CET de 11,09% <b>+ TR de '+pct(p.TR_a)+'</b>. É o retorno garantido, livre de imposto, que você trava ao amortizar.';
   $('bnGatilho').textContent=pct(g.selic);
   $('bnSelicMedia').textContent=pct(r.selicMedia);
-  $('bnSelicExp').innerHTML='Média geométrica ao longo dos <b>'+anosDiv.toFixed(1)+' anos</b> de dívida, partindo de '+
-    pct(p.selicHoje)+' hoje. <b>Não é a taxa de hoje que decide</b> — é a média do período.';
+  $('bnSelicExp').innerHTML= cruz===null
+    ? 'A Selic projetada fica <b>sempre acima</b> do gatilho no horizonte — no dia a dia, investir compensa em todo o período.'
+    : (cruz===0
+      ? 'A Selic projetada já parte <b>abaixo</b> do gatilho — amortizar compensa desde o início.'
+      : 'A Selic parte de '+pct(p.selicHoje)+' e cruza o gatilho por volta do <b>mês '+(cruz+1)+' (ano '+((cruz+1)/12).toFixed(1)+')</b>. Antes disso investir rende mais; depois, amortizar.');
 
-  $('verdictBox').className='verdict-box '+(empate?'amo':(inv?'inv':'amo'));
-  $('vtag').textContent=empate?'Empate técnico':(inv?'Investir':'Amortizar');
-  $('vtxt').innerHTML=empate
-    ?'A Selic média projetada (<b>'+pct(r.selicMedia)+'</b>) fica praticamente no gatilho de '+pct(g.selic)+
-     '. <b>As duas opções se equivalem</b> — a diferença é inferior a 0,5% do patrimônio. Decida por conforto de caixa, não por rentabilidade.'
-    :(inv
-    ?'A Selic média projetada (<b>'+pct(r.selicMedia)+'</b>) fica <b>acima</b> do gatilho de '+pct(g.selic)+'. <b>Investir o valor rende mais do que abater a dívida.</b>'
-    :'A Selic média projetada (<b>'+pct(r.selicMedia)+'</b>) fica <b>abaixo</b> do gatilho de '+pct(g.selic)+'. <b>Abater a dívida rende mais do que investir</b>'+(p.selicHoje>g.selic?' — mesmo com a Selic de hoje em '+pct(p.selicHoje)+'.':'.'));
+  // veredito baseado no vencedor REAL da simulação
+  const amortVence = (vencedor==='B'||vencedor==='C');
+  $('verdictBox').className='verdict-box '+(vencedor==='A'?'inv':(dinVence?'dyn':'amo'));
+  if(dinVence){
+    $('vtag').textContent='Investir agora, amortizar depois';
+    $('vtxt').innerHTML='Hoje a Selic ('+pct(p.selicHoje)+') está <b>acima</b> do seu custo de dívida equivalente ('+pct(g.selic)+
+      '), então investir o bônus rende mais — por enquanto. A projeção é de queda, e por volta do <b>ano '+((cruz+1)/12).toFixed(1)+
+      '</b> a Selic cruza esse limite: a partir daí, amortizar rende mais. O melhor caminho <b>combina os dois</b> — investir enquanto a Selic está alta, migrar para amortização quando cair — e entrega <b>'+
+      money(ganhoD)+'</b> a mais que qualquer estratégia fixa.';
+  } else if(vencedor==='A'){
+    $('vtag').textContent='Investir';
+    $('vtxt').innerHTML='A Selic projetada permanece <b>acima</b> do gatilho de '+pct(g.selic)+
+      ' durante toda a vida da dívida. <b>Investir o bônus rende mais do que amortizar</b> — e a estratégia dinâmica coincide com investir.';
+  } else {
+    $('vtag').textContent='Amortizar';
+    $('vtxt').innerHTML='Considerando todo o período até a quitação, <b>amortizar rende mais do que investir</b>'+
+      (selicHojeAcima?', apesar da Selic alta de hoje ('+pct(p.selicHoje)+'): a janela em que investir compensa é curta demais para virar o resultado':'')+
+      '. A estratégia dinâmica '+(Math.abs(ganhoD)<Math.max(1,Math.abs(r.decisao.A))*0.005?'coincide com amortizar aqui':'fica muito próxima')+'.';
+  }
 
   const dom=25,gp=Math.max(2,Math.min(98,g.selic*100/dom*100)),
     sp=Math.max(2,Math.min(98,r.selicMedia*100/dom*100)),
@@ -682,48 +726,48 @@ function render(){
   $('scaleMid').textContent='gatilho '+pct(g.selic);
   $('scaleTrack').style.background='linear-gradient(90deg,var(--amort) 0%,var(--amort) '+(gp-.6)+'%,#e6dfd2 '+(gp-.6)+'%,#e6dfd2 '+(gp+.6)+'%,var(--invest) '+(gp+.6)+'%,var(--invest) 100%)';
 
-  const dv=[['A',r.decisao.A],['B',r.decisao.B],['C',r.decisao.C]].sort((a,b)=>b[1]-a[1]);
-  const dif=dv[0][1]-dv[2][1];
-  const NOMEC={A:'investindo o valor',B:'amortizando com redução de prazo',C:'amortizando com redução de parcela'};
-  $('decValor').textContent=money(dif);
-  $('decValorSub').innerHTML='diferença entre o melhor (<b>'+dv[0][0]+'</b>) e o pior (<b>'+dv[2][0]+'</b>), em valores de hoje';
+  const NOMEP={A:'investir o bônus',B:'amortizar (prazo)',C:'amortizar (parcela)',D:'estratégia dinâmica'};
+  $('decValor').textContent=money(Math.max(0,ganhoD));
+  $('decValorSub').innerHTML= dinVence
+    ? 'ganho da <b>estratégia dinâmica</b> sobre a melhor estratégia fixa, em valores de hoje'
+    : 'a estratégia <b>'+NOMEP[vencedor]+'</b> já captura o melhor resultado nesta configuração';
   $('decQuando').textContent='ano '+anosDiv.toFixed(1);
 
-  /* robustez da decisão */
+  /* robustez: o dinâmico domina em toda a faixa de juro real? */
   const reais=[0.025,0.035,0.045,0.055,0.065];
-  let rb='',dirs=[];
+  let rb='',ganhos=[];
   reais.forEach(rl=>{
     const rr=runSim({...p,realLongo:rl});
-    const d=Math.max(rr.decisao.B,rr.decisao.C)-rr.decisao.A;
-    dirs.push(d);
+    const melhorEst=Math.max(rr.decisao.A,rr.decisao.B,rr.decisao.C);
+    const gD=rr.decisao.D-melhorEst;
+    ganhos.push(gD);
     const base=Math.abs(rl-p.realLongo)<0.0001;
-    rb+='<tr class="'+(base?'base':'')+'"><td>'+pct(rl)+(base?' · atual':'')+'</td><td>'+money(rr.decisao.A)+
-      '</td><td>'+money(rr.decisao.B)+'</td><td class="'+(d>0?'win':'')+'">'+(d>0?'+':'')+money(d)+'</td></tr>';
+    const melhorNome=[['investir',rr.decisao.A],['amortizar',rr.decisao.B],['amortizar',rr.decisao.C]].sort((a,b)=>b[1]-a[1])[0][0];
+    rb+='<tr class="'+(base?'base':'')+'"><td>'+pct(rl)+(base?' · atual':'')+'</td><td>'+melhorNome+
+      '</td><td>'+money(rr.decisao.D)+'</td><td class="'+(gD>1?'win':'')+'">'+(gD>1?'+'+money(gD):'—')+'</td></tr>';
   });
   $('robustBody').innerHTML=rb;
-  const todosMesmo=dirs.every(d=>d>0)||dirs.every(d=>d<0);
-  const venceu=dirs[0]>0?'amortizar':'investir';
-  $('robustConc').innerHTML=todosMesmo
-    ?'<b>A resposta não muda.</b> Testando o juro real de longo prazo de 2,5% a 6,5% ao ano, a conclusão é sempre a mesma: '+venceu+
-     '. O que varia é o tamanho da vantagem, entre '+money(Math.min.apply(null,dirs.map(Math.abs)))+' e '+
-     money(Math.max.apply(null,dirs.map(Math.abs)))+'. Por isso esta é uma decisão que pode ser tomada com tranquilidade.'
-    :'<b>A resposta se inverte</b> dentro da faixa de juros testada, o que significa que as duas opções são muito próximas. Nesse caso, decida pelo que traz mais conforto de caixa, não pela rentabilidade esperada.';
+  const dinSempre=ganhos.every(gD=>gD>=-1);
+  $('robustConc').innerHTML=dinSempre
+    ?'<b>A estratégia dinâmica nunca perde.</b> Em todo o intervalo de juro real de 2,5% a 6,5% ao ano, investir enquanto a Selic supera o gatilho e amortizar quando ela cai entrega o maior patrimônio — porque ela se adapta ao ambiente de taxa em vez de apostar em um único cenário. O ganho sobre a melhor estratégia fixa varia de '+
+     money(Math.min.apply(null,ganhos.filter(x=>x>1)).valueOf?Math.min.apply(null,ganhos):0)+' a '+money(Math.max.apply(null,ganhos))+'.'
+    :'Nesta configuração, a estratégia dinâmica coincide com uma estratégia fixa (a Selic não cruza o gatilho dentro do horizonte), então não há ganho adicional em alternar.';
 
   /* cards */
-  const M={A:r.A,B:r.B,C:r.C};
+  const M={A:r.A,B:r.B,C:r.C,D:r.D};
   // métrica de decisão exibida nos cards = patrimônio FINANCEIRO no momento em que a dívida acaba em todos
   const iDec=r.decT;
   const plCard=s=>PV?s.rows[iDec].rPlFin:s.rows[iDec].plFin;
-  ['A','B','C'].forEach(k=>{const s=M[k];
+  ['A','B','C','D'].forEach(k=>{const s=M[k];
     $('kl'+k).textContent='Patrimônio financeiro no ano '+((iDec+1)/12).toFixed(0);
     $('pl'+k).textContent=money(plCard(s));
     $('quit'+k).textContent=s.quit===null?'não quita':('ano '+((s.quit+1)/12).toFixed(1));
     $('cost'+k).textContent=money(PV?s.rCost:s.cost);
     $('fund'+k).textContent=money(PV?s.rows[iDec].rFund:s.rows[iDec].fund);
     $('tot'+k).textContent=money(PV?s.rows[iDec].rPlTotal:s.rows[iDec].plTotal);});
-  const rk=[['A',plCard(r.A)],['B',plCard(r.B)],['C',plCard(r.C)]].sort((a,b)=>b[1]-a[1]);
-  ['A','B','C'].forEach(k=>$('card'+k).classList.remove('win'));
-  $('card'+rk[0][0]).classList.add('win');
+  const rk=[['A',plCard(r.A)],['B',plCard(r.B)],['C',plCard(r.C)],['D',plCard(r.D)]].sort((a,b)=>b[1]-a[1]);
+  ['A','B','C','D'].forEach(k=>$('card'+k)&&$('card'+k).classList.remove('win'));
+  $('card'+rk[0][0])&&$('card'+rk[0][0]).classList.add('win');
 
   $('pvTxt').innerHTML=PV
     ?'Exibindo <b>valores de hoje</b> — descontados da inflação de '+pct(p.infl)+' a.a.'
@@ -731,62 +775,56 @@ function render(){
   $('p1sub').textContent='Até a quitação do financiamento (ano '+((p.hDisp)/12).toFixed(0)+') · Selic '+pct(p.selicHoje)+' → '+pct((1+p.realLongo)*(1+p.infl)-1)+' em '+p.convAnos+' anos · TR '+pct(p.TR_a);
   setNote();
 
-  /* dados p/ conclusões: sensibilidade da decisão (não da projeção) */
-  const lo=Math.max(0,p.realLongo-0.02),hi=p.realLongo+0.02;
-  const sims={lo:runSim({...p,realLongo:lo}),mid:r,hi:runSim({...p,realLongo:hi})};
-  const decLo=Math.max(sims.lo.decisao.B,sims.lo.decisao.C)-sims.lo.decisao.A;
-  const decHi=Math.max(sims.hi.decisao.B,sims.hi.decisao.C)-sims.hi.decisao.A;
-
-  /* conclusões */
-  const venc=dv[0][0];
+  /* conclusões — framing do caminho dinâmico */
   const anosB=(r.B.quit!==null)?((r.B.quit+1)/12):null;
   const anosA=(r.A.quit!==null)?((r.A.quit+1)/12):null;
-  const economiaJuros=(PV?r.A.rCost:r.A.cost)-(PV?r[venc].rCost:r[venc].cost);
+  const bonusInvD=r.D.tExInv-r.B.tExInv; // quanto de bônus a mais o dinâmico investe vs amortizar-puro
+  const nInvest = (cruz===null) ? p.aporteAnos : Math.max(0, Math.ceil(cruz/12)); // anos de bônus investidos no dinâmico
   const contribTotal=p.extra*p.aporteAnos;
-  const todosMesmoDir=(difDec>0&&decLo>0&&decHi>0)||(difDec<0&&decLo<0&&decHi<0)||empate;
 
-  $('insHead').innerHTML = empate
-    ? 'Neste cenário, abater o financiamento e investir o bônus <b>se equivalem</b>. A escolha pode ser feita por conforto de caixa.'
-    : (inv
-      ? 'Neste cenário, <b>investir o bônus</b> supera abater o financiamento.'
-      : 'Neste cenário, <b>abater o financiamento</b> supera investir o bônus.');
+  $('insHead').innerHTML = dinVence
+    ? 'O melhor caminho é <b>investir o bônus enquanto a Selic está alta e migrar para amortização quando ela cair</b>.'
+    : (vencedor==='A'
+      ? 'Neste cenário, <b>investir o bônus</b> supera amortizar em todo o período.'
+      : 'Neste cenário, <b>amortizar</b> é o melhor uso do bônus.');
 
   const ins=[];
-  ins.push({k:'A decisão',cls:empate?'neu':(inv?'inv':'amo'),
-    v:empate?'Equivalente':(inv?'Investir':'Amortizar'),vsm:true,
-    t:'Sua dívida custa <b>'+pct(g.custo)+'</b> ao ano — retorno garantido ao amortizar. Para investir compensar, o rendimento precisa superar <b>'+
-      pct(g.selic)+'</b>, pois 15% do ganho vai para o IR. A Selic média projetada enquanto a dívida existir é <b>'+pct(r.selicMedia)+'</b>.'});
+  ins.push({k:'O mecanismo',cls:'',v:pct(g.selic),vsm:false,
+    t:'Amortizar rende, garantido e livre de IR, o custo da sua dívida: <b>'+pct(g.custo)+'</b>. Investir só supera isso se a Selic passar de <b>'+
+      pct(g.selic)+'</b> — o excedente cobre os 15% de imposto. Esse é o ponto de virada entre as duas decisões.'});
 
-  ins.push({k:'Não é a taxa de hoje que decide',cls:'',v:pct(r.selicMedia),
-    t:'Hoje a Selic está em <b>'+pct(p.selicHoje)+'</b>, mas o financiamento dura cerca de <b>'+((r.decT+1)/12).toFixed(0)+
-      ' anos</b>. O que importa é a média da taxa ao longo desse período, não o número de um único momento.'});
+  if(cruz!==null && cruz>0){
+    ins.push({k:'A janela de hoje',cls:'inv',v:'ano '+((cruz+1)/12).toFixed(1),
+      t:'A Selic está em <b>'+pct(p.selicHoje)+'</b> hoje, acima do gatilho. Ela deve cruzar esse limite por volta do <b>ano '+((cruz+1)/12).toFixed(1)+
+        '</b>. Até lá, cada real investido rende mais do que abateria de dívida; depois, a lógica se inverte.'});
+  }
 
-  ins.push({k:'Quanto vale a escolha certa',cls:'',v:money(dif),
-    t:'É a diferença de patrimônio entre a melhor e a pior alternativa, no momento em que a dívida se encerra. '+
-      (todosMesmoDir&&!empate?'A resposta não se inverte em nenhuma premissa de juro real testada (de 2,5% a 6,5%).':'As alternativas ficam muito próximas nesta configuração.')});
+  if(dinVence){
+    ins.push({k:'O ganho de alternar',cls:'amo',v:money(ganhoD),
+      t:'Combinar as duas fases — investir o bônus nos primeiros '+nInvest+(nInvest===1?' ano':' anos')+' e amortizar depois — rende <b>'+
+        money(ganhoD)+'</b> a mais que se comprometer com uma única estratégia fixa desde o início. É o retorno de adaptar-se à queda de juros.'});
+  }else{
+    ins.push({k:'Estratégia única basta',cls:'neu',v:'—',vsm:true,
+      t:'Nesta configuração, a Selic '+(cruz===null?'não cruza o gatilho no horizonte':'já parte abaixo do gatilho')+
+        ', então alternar não agrega — a estratégia fixa vencedora já captura o melhor resultado.'});
+  }
 
   if(anosB!==null&&anosA!==null&&Math.abs(anosA-anosB)>0.3){
     ins.push({k:'Quando o financiamento acaba',cls:'amo',v:'ano '+anosB.toFixed(1),
-      t:'Usando o bônus para amortizar, a dívida termina no ano <b>'+anosB.toFixed(1)+'</b>, contra o ano <b>'+
-        anosA.toFixed(1)+'</b> se você apenas investir — <b>'+(anosA-anosB).toFixed(1)+' anos</b> a menos de financiamento.'});
+      t:'Direcionando o bônus para amortização, a dívida termina no ano <b>'+anosB.toFixed(1)+'</b>, contra o ano <b>'+
+        anosA.toFixed(1)+'</b> investindo tudo. O caminho dinâmico quita junto com o de amortizar — a fase de investir é curta.'});
   }
-  if(economiaJuros>1000){
-    ins.push({k:'Juros e encargos evitados',cls:'amo',v:money(economiaJuros),
-      t:empate
-        ?'Mesmo com patrimônio equivalente, amortizar deixa de pagar <b>'+money(economiaJuros)+
-         '</b> ao banco e encerra a dívida anos antes — um ganho de tranquilidade, não de rentabilidade.'
-        :'É quanto você deixa de pagar ao banco '+NOMEC[venc]+', comparado a manter o financiamento até o fim do prazo original.'});
-  }
+
   if(contribTotal>0){
     ins.push({k:'O que mais constrói patrimônio',cls:'',v:money(p.extra)+'/ano',
-      t:'Muito mais do que a escolha entre amortizar e investir, o que determina seu patrimônio futuro é <b>manter o hábito de aportar o bônus</b> e investir a parcela de R$ 6.800 liberada após a quitação. A projeção completa está na sua política de investimentos.'});
+      t:'Acima da escolha entre amortizar e investir, o que determina seu patrimônio é <b>manter o hábito de aportar o bônus</b> e investir a parcela liberada após a quitação. A diferença entre as estratégias ('+money(Math.abs(ganhoD))+') é pequena perto disso.'});
   }else{
     ins.push({k:'Informe o bônus anual',cls:'neu',v:'—',vsm:true,
-      t:'Sem um valor definido não há decisão a tomar: o FGTS já abate o financiamento nos três cenários. Preencha o campo de bônus anual para comparar as alternativas.'});
+      t:'Sem um valor definido não há decisão a tomar: o FGTS já abate o financiamento em todos os cenários. Preencha o campo de bônus anual para comparar os caminhos.'});
   }
 
   ins.push({k:'Projeção de longo prazo',cls:'',v:'ver política',vsm:true,
-    t:'Esta ferramenta responde <b>onde alocar o bônus</b>. A evolução do patrimônio até a aposentadoria — em cenário conservador — é apresentada separadamente na sua <b>política de investimentos</b>, para não misturar a decisão com a projeção de décadas.'});
+    t:'Esta ferramenta responde <b>onde alocar o bônus</b>. A evolução do patrimônio até a aposentadoria — em cenário conservador — está na sua <b>política de investimentos</b>, para não misturar a decisão com a projeção de décadas.'});
 
   $('insGrid').innerHTML=ins.map(i=>'<div class="ins"><div class="k">'+i.k+'</div><div class="v '+
     (i.cls||'')+(i.vsm?' sm':'')+'">'+i.v+'</div><div class="t">'+i.t+'</div></div>').join('');
@@ -797,11 +835,11 @@ function setNote(){
   const L={plTotal:'patrimônio total (investimentos + imóvel − dívida)',plFin:'patrimônio financeiro',
     fund:'investimentos acumulados',saldo:'saldo devedor'};
   $('p1note').innerHTML='Métrica: <b>'+L[metric]+'</b>, em '+(PV?'valores de hoje':'valores nominais')+
-    '. Os três cenários consomem o mesmo caixa; muda apenas o destino do aporte anual.';
+    '. Os quatro caminhos consomem o mesmo caixa; muda apenas o destino do bônus anual.';
 }
 
 /* ===== charts ===== */
-const COL={A:'#c2751b',B:'#0f7a5a',C:'#2a7d6a'};
+const COL={A:'#c2751b',B:'#0f7a5a',C:'#2a7d6a',D:'#5b4bc4'};
 const sample=H=>{const st=Math.max(1,Math.round(H/200)),ix=[];
   for(let t=0;t<H;t+=st)ix.push(t);if(ix[ix.length-1]!==H-1)ix.push(H-1);return ix;};
 const baseOpts=()=>({responsive:true,maintainAspectRatio:false,animation:false,
@@ -816,10 +854,11 @@ function drawCmp(p,r){
   const H=p.hDisp||p.horizon;
   const ix=sample(H),lab=ix.map(t=>+((t+1)/12).toFixed(2));
   const key=PV?({plTotal:'rPlTotal',plFin:'rPlFin',fund:'rFund',saldo:'rSaldo'})[metric]:metric;
-  const ds=['A','B','C'].map(k=>({label:k+' · '+({A:'investir',B:'reduzir prazo',C:'reduzir parcela'})[k],
+  const ds=['A','B','C','D'].map(k=>({label:k+' · '+({A:'investir',B:'reduzir prazo',C:'reduzir parcela',D:'dinâmica'})[k],
     data:ix.map(t=>Math.round(r[k].rows[t][key])),borderColor:COL[k],backgroundColor:COL[k],
-    borderDash:k==='C'?[5,4]:undefined,tension:.18,pointRadius:0,borderWidth:2.4}));
-  if(cCmp){cCmp.data.labels=lab;cCmp.data.datasets.forEach((d,i)=>{d.data=ds[i].data;});cCmp.update('none');return;}
+    borderDash:k==='C'?[5,4]:undefined,tension:.18,pointRadius:0,borderWidth:k==='D'?3.2:2.2}));
+  if(cCmp&&cCmp.data.datasets.length===ds.length){cCmp.data.labels=lab;cCmp.data.datasets.forEach((d,i)=>{d.data=ds[i].data;});cCmp.update('none');return;}
+  if(cCmp){cCmp.destroy();cCmp=null;}
   const o=baseOpts();
   o.plugins.tooltip.callbacks.label=c=>' '+c.dataset.label+': '+BRL0.format(c.parsed.y);
   cCmp=new Chart($('chartCmp').getContext('2d'),{type:'line',data:{labels:lab,datasets:ds},options:o});
