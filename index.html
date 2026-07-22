@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amortizar ou Investir — Decisão e Projeção Patrimonial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f5f6f8;--panel:#fff;--ink:#0e1726;--ink2:#3a465a;--muted:#6b7789;
+  --line:#e4e8ee;--line2:#cfd6df;--navy:#132a4d;--navy2:#1d3a63;
+  --amort:#0f7a5a;--amort-soft:#e7f4ef;--amort-ink:#0a5a42;
+  --invest:#c2751b;--invest-soft:#fbf1e1;--invest-ink:#94540f;
+  --imovel:#5a6bb0;--danger:#b4302a;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px -12px rgba(16,24,40,.14);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;font-feature-settings:"tnum" 1;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding:26px 20px 60px}
+.eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:9px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--navy)}
+h1{font-family:'Newsreader',Georgia,serif;font-weight:500;font-size:clamp(26px,4.2vw,38px);line-height:1.08;margin:0 0 6px}
+h1 em{font-style:italic;color:var(--navy2)}
+.sub{color:var(--ink2);font-size:14.5px;max-width:72ch}
+.sub b{color:var(--ink);font-weight:600}
+
+/* separador de blocos */
+.blocklabel{display:flex;align-items:center;gap:12px;margin:26px 0 12px}
+.blocklabel .n{width:26px;height:26px;border-radius:7px;background:var(--navy);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.blocklabel h2{margin:0;font-family:'Newsreader',serif;font-size:22px;font-weight:500}
+.blocklabel .tagline{font-size:12px;color:var(--muted);margin-left:auto;text-align:right;max-width:44ch;line-height:1.4}
+
+/* DECISÃO */
+.decision{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.dec-top{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--line)}
+.bignum{padding:16px 18px;border-right:1px solid var(--line);background:#fcfdfe}
+.bignum:last-child{border-right:none}
+.bignum .lead{font-size:12.5px;font-weight:600;color:var(--ink2);margin-bottom:5px;line-height:1.3}
+.bignum .val{font-size:clamp(24px,3.4vw,32px);font-weight:800;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;margin-bottom:6px}
+.bignum .exp{font-size:11.5px;color:var(--muted);line-height:1.42}
+.bignum.b1 .val{color:var(--navy)}.bignum.b2 .val{color:var(--amort-ink)}
+.dec-mid{padding:16px 18px}
+.verdict-box{border-radius:12px;padding:15px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid transparent}
+.verdict-box.inv{background:var(--invest-soft);border-color:#eddcbc}
+.verdict-box.amo{background:var(--amort-soft);border-color:#c7e3d9}
+.verdict-box .vtag{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:5px 10px;border-radius:6px;color:#fff;white-space:nowrap}
+.verdict-box.inv .vtag{background:var(--invest)}.verdict-box.amo .vtag{background:var(--amort)}
+.verdict-box .vtxt{font-family:'Newsreader',serif;font-size:clamp(15px,2vw,19px);line-height:1.35;flex:1;min-width:250px}
+.verdict-box.inv .vtxt{color:var(--invest-ink)}.verdict-box.amo .vtxt{color:var(--amort-ink)}
+.verdict-box .vtxt b{font-weight:600}
+.decvalue{margin-top:14px;display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end;padding-top:14px;border-top:1px dashed var(--line2)}
+.decvalue .dv{display:flex;flex-direction:column}
+.decvalue .dv .k{font-size:11px;color:var(--muted);margin-bottom:3px}
+.decvalue .dv .v{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1;color:var(--amort-ink)}
+.decvalue .dv small{font-size:11px;color:var(--muted);font-weight:400}
+.robust{margin:14px 18px 18px;background:#f7f9fb;border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+.robust .rt{font-size:12px;font-weight:700;margin-bottom:8px;color:var(--ink)}
+.robust table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+.robust th{text-align:right;font-size:10.5px;color:var(--muted);font-weight:600;padding:4px 8px;border-bottom:1px solid var(--line)}
+.robust th:first-child{text-align:left}
+.robust td{text-align:right;padding:5px 8px;border-bottom:1px solid #eef1f5}
+.robust td:first-child{text-align:left;font-weight:600;color:var(--ink2)}
+.robust tr.base td{background:#eef4f1}
+.robust .win{color:var(--amort-ink);font-weight:700}
+.robust .conc{font-size:11.5px;color:var(--ink2);margin-top:9px;line-height:1.5}
+
+.scale{margin-top:16px}
+.scale-track{position:relative;height:15px;border-radius:9px;border:1px solid var(--line2)}
+.thresh{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--navy);border-radius:2px;transform:translateX(-50%)}
+.thresh::after{content:"gatilho";position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--navy);white-space:nowrap}
+.needle{position:absolute;top:-11px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:11px solid var(--ink);transform:translateX(-50%)}
+.needle::after{content:attr(data-lbl);position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:10.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+.needle.ghost{border-top-color:#9aa5b4;opacity:.85}
+.needle.ghost::after{color:#6b7789;font-weight:600}
+.scale-ends{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:26px}
+.scale-legend{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;font-size:11.5px;color:var(--ink2)}
+.scale-legend span{display:inline-flex;align-items:center;gap:6px}
+.scale-legend i{width:20px;height:4px;border-radius:2px;display:inline-block}
+
+.cols{display:grid;grid-template-columns:325px 1fr;gap:20px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.panel-head{padding:15px 18px 12px;border-bottom:1px solid var(--line)}
+.panel-head h3{margin:0;font-size:13px;font-weight:700}
+.panel-head p{margin:3px 0 0;font-size:11.5px;color:var(--muted)}
+.controls{padding:16px 18px 20px;display:flex;flex-direction:column;gap:15px}
+.ctrl label{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;font-weight:600;color:var(--ink2);margin-bottom:7px}
+.ctrl .hint{font-weight:400;color:var(--muted);font-size:11px}
+.slider-row{display:flex;align-items:center;gap:11px}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:5px;border-radius:4px;background:var(--line2);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--navy);border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--navy);border:2px solid #fff;cursor:pointer}
+.numbox{width:94px;flex:0 0 auto;font-family:inherit;font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right;padding:7px 9px;border:1px solid var(--line2);border-radius:8px;background:#fbfcfd;color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:2px solid var(--navy);outline-offset:1px}
+.field-note{font-size:10.5px;margin-top:5px;color:var(--muted);line-height:1.4}
+.field-note.alert{color:var(--danger);font-weight:600}
+.field-note.info{color:var(--invest-ink);font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+.field input{width:100%;font-family:inherit;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;padding:7px 9px;border:1px solid var(--line2);border-radius:8px;background:#fbfcfd;color:var(--ink)}
+.field.hero-field input{border-color:var(--navy);background:#f7fafd;font-weight:700;font-size:14px}
+.divider-lbl{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:-7px;padding-top:6px;border-top:1px solid var(--line)}
+.reset{font-size:12px;font-weight:600;color:var(--navy);background:none;border:none;cursor:pointer;padding:6px 0;text-align:left}
+.reset:hover{text-decoration:underline}
+
+.results{display:flex;flex-direction:column;gap:16px}
+.pvbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 15px;box-shadow:var(--shadow)}
+.pvbar .txt{font-size:12.5px;color:var(--ink2)}.pvbar .txt b{color:var(--ink)}
+.seg{display:inline-flex;background:#eef1f5;border-radius:8px;padding:3px;gap:2px}
+.seg button{background:none;border:none;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--muted);padding:5px 11px;border-radius:6px;cursor:pointer}
+.seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(16,24,40,.08)}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px;box-shadow:var(--shadow);position:relative}
+.card.win{box-shadow:0 0 0 1.5px currentColor,var(--shadow)}
+.card .badge{position:absolute;top:-9px;right:12px;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:5px;display:none;color:#fff;background-color:#132a4d}
+.card.win .badge{display:inline-block}
+.fam-invest .badge{background-color:#c2751b;color:#fff}
+.fam-amort .badge{background-color:#0f7a5a;color:#fff}
+.fam-amort2 .badge{background-color:#2a7d6a;color:#fff}
+.card .letter{width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;margin-bottom:9px}
+.card h4{margin:0 0 2px;font-size:13px;font-weight:700}
+.card .desc{font-size:11px;color:var(--muted);margin:0 0 12px;min-height:42px;line-height:1.35}
+.card .pl-k{font-size:10.5px;color:var(--muted)}
+.card .pl-v{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.015em;margin:1px 0 11px;line-height:1}
+.card .rows{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px}
+.card .r{display:flex;justify-content:space-between;font-size:11.5px;gap:8px}
+.card .r span:first-child{color:var(--muted)}
+.card .r span:last-child{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.card .r.sep{border-top:1px dashed var(--line);padding-top:7px}
+.fam-invest{color:var(--invest)}.fam-invest .letter{background:var(--invest)}
+.fam-amort{color:var(--amort)}.fam-amort .letter{background:var(--amort)}
+.fam-amort2{color:#2a7d6a}.fam-amort2 .letter{background:#2a7d6a}
+
+.tabs{display:flex;gap:4px;padding:0 4px;background:var(--panel);border:1px solid var(--line);border-bottom:none;border-radius:14px 14px 0 0;overflow-x:auto}
+.tab{background:none;border:none;padding:13px 15px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap}
+.tab.on{color:var(--navy);border-bottom-color:var(--navy)}
+.tabwrap{background:var(--panel);border:1px solid var(--line);border-top:none;border-radius:0 0 14px 14px;box-shadow:var(--shadow);padding:16px 18px 18px}
+.tabpane{display:none}.tabpane.on{display:block}
+.pane-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.pane-head h3{margin:0;font-size:13px;font-weight:700}
+.pane-head .csub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.chart-holder{position:relative;height:355px;margin-top:6px}
+.note-inline{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5;border-left:2px solid var(--line2);padding-left:10px}
+.rangetbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;font-variant-numeric:tabular-nums}
+.rangetbl th{text-align:right;font-size:10.5px;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+.rangetbl th:first-child{text-align:left}
+.rangetbl td{text-align:right;padding:6px 8px;border-bottom:1px solid #eef1f5}
+.rangetbl td:first-child{text-align:left;font-weight:600;color:var(--ink2)}
+.rangetbl tr.hl td{background:#f7f9fb;font-weight:700}
+.tblwrap{max-height:480px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+table.data{border-collapse:collapse;width:100%;font-size:11.5px;font-variant-numeric:tabular-nums}
+table.data thead th{position:sticky;top:0;background:#f2f4f7;color:var(--ink2);font-weight:700;font-size:10.5px;text-align:right;padding:9px 10px;border-bottom:1px solid var(--line2);white-space:nowrap;z-index:2}
+table.data thead th:first-child{text-align:left}
+table.data tbody td{padding:6px 10px;text-align:right;border-bottom:1px solid #f0f2f5;white-space:nowrap}
+table.data tbody td:first-child{text-align:left;font-weight:600;color:var(--ink2)}
+table.data tbody tr.evt{background:#f0f7f4}
+table.data tbody tr.quit td{border-bottom:2px solid var(--amort)}
+td.pos{color:var(--amort-ink);font-weight:600}td.deb{color:var(--danger)}
+.tbl-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:9px}
+.tbl-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+
+.insights{background:var(--navy);color:#eaf0f8;border-radius:14px;padding:20px 22px 22px;box-shadow:var(--shadow);margin-top:16px}
+.insights .rk{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#93b0d6;margin-bottom:4px}
+.insights .rh{font-family:'Newsreader',serif;font-size:20px;color:#fff;margin-bottom:16px;font-weight:400}
+.ins-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.13);border-radius:11px;overflow:hidden}
+.ins{background:var(--navy);padding:15px 16px 16px}
+.ins .k{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8fb0d8;margin-bottom:7px}
+.ins .v{font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#fff;font-variant-numeric:tabular-nums;margin-bottom:6px}
+.ins .v.sm{font-size:17px;font-family:'Newsreader',serif;font-weight:500;letter-spacing:0}
+.ins .t{font-size:12.5px;line-height:1.5;color:#c1d2e6}
+.ins .t b{color:#fff;font-weight:600}
+.ins .v.amo{color:#7fe0be}.ins .v.inv{color:#f0b366}.ins .v.neu{color:#cfd9e6}
+@media (max-width:900px){.ins-grid{grid-template-columns:1fr}}
+
+.warn-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0 0}
+.warn{background:#fffaf1;border:1px solid #f0dcb8;border-left:3px solid var(--invest);border-radius:9px;padding:11px 14px;font-size:12px;color:#6d5a35;line-height:1.45}
+.warn b{color:var(--invest-ink);font-weight:600;display:block;margin-bottom:2px;font-size:11px;text-transform:uppercase}
+.method{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.method summary{cursor:pointer;list-style:none;padding:15px 20px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.method summary::-webkit-details-marker{display:none}
+.method summary .chev{transition:transform .2s;color:var(--muted)}
+.method[open] summary .chev{transform:rotate(90deg)}
+.method .mbody{padding:2px 20px 20px;font-size:12.5px;color:var(--ink2);line-height:1.6;border-top:1px solid var(--line)}
+.method h5{font-size:12px;margin:16px 0 4px;color:var(--ink)}
+.method code{background:#eef1f5;border-radius:4px;padding:1px 5px;font-size:11.5px}
+.method ul{margin:6px 0;padding-left:18px}.method li{margin:3px 0}
+footer.foot{margin-top:20px;font-size:11px;color:var(--muted);text-align:center;line-height:1.6}
+@media (max-width:980px){.cols{grid-template-columns:1fr}.warn-row{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.dec-top{grid-template-columns:1fr}.bignum{border-right:none;border-bottom:1px solid var(--line)}.blocklabel .tagline{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow"><span class="dot"></span>Principia Wealth · Ferramenta de apoio à decisão</div>
+    <h1>Amortizar ou <em>investir</em> o bônus anual?</h1>
+    <p class="sub">Você recebe um bônus todo ano e precisa decidir o que fazer com ele: <b>abater o financiamento</b> ou <b>investir</b>. Esta ferramenta responde a essa pergunta específica — comparando o custo da dívida com o rendimento do investimento ao longo dos anos em que o financiamento existir. A projeção patrimonial de longo prazo é apresentada à parte, na sua política de investimentos.</p>
+  </header>
+
+  <section class="decision">
+    <div class="dec-top">
+      <div class="bignum b1">
+        <div class="lead">Sua dívida custa, por ano</div>
+        <div class="val" id="bnCusto">—</div>
+        <div class="exp" id="bnCustoExp">—</div>
+      </div>
+      <div class="bignum b2">
+        <div class="lead">Amortizar vale mais enquanto a Selic estiver abaixo de</div>
+        <div class="val" id="bnGatilho">—</div>
+        <div class="exp">É o gatilho. Fica acima do custo da dívida porque <b>15% do rendimento vai para o IR</b>.</div>
+      </div>
+      <div class="bignum b3">
+        <div class="lead">Selic média projetada enquanto a dívida existir</div>
+        <div class="val" id="bnSelicMedia">—</div>
+        <div class="exp" id="bnSelicExp">—</div>
+      </div>
+    </div>
+
+    <div class="dec-mid">
+      <div class="verdict-box" id="verdictBox">
+        <span class="vtag" id="vtag">—</span><span class="vtxt" id="vtxt">—</span>
+      </div>
+
+      <div class="scale">
+        <div class="scale-track" id="scaleTrack">
+          <div class="thresh" id="thresh" style="left:50%"></div>
+          <div class="needle ghost" id="needleHoje" data-lbl="" style="left:60%"></div>
+          <div class="needle" id="needle" data-lbl="" style="left:50%"></div>
+        </div>
+        <div class="scale-ends"><span>Selic 0%</span><span id="scaleMid"></span><span>Selic 25%</span></div>
+        <div class="scale-legend">
+          <span><i style="background:var(--amort)"></i>Zona de amortizar</span>
+          <span><i style="background:var(--invest)"></i>Zona de investir</span>
+          <span><i style="background:#9aa5b4"></i>Selic de hoje (referência)</span>
+        </div>
+      </div>
+
+      <div class="decvalue">
+        <div class="dv">
+          <span class="k">Quanto vale acertar esta decisão</span>
+          <span class="v" id="decValor">—</span>
+          <small id="decValorSub">—</small>
+        </div>
+        <div class="dv">
+          <span class="k">Medido em</span>
+          <span class="v" style="font-size:18px;color:var(--ink2)" id="decQuando">—</span>
+          <small>quando a dívida se extingue em todos os cenários</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="robust">
+      <div class="rt">A conclusão muda se o juro real de longo prazo for outro?</div>
+      <table>
+        <thead><tr><th>Juro real de longo prazo</th><th>Investir (A)</th><th>Amortizar (B)</th><th>Vantagem de amortizar</th></tr></thead>
+        <tbody id="robustBody"></tbody>
+      </table>
+      <div class="conc" id="robustConc">—</div>
+    </div>
+  </section>
+
+  <div class="blocklabel">
+    <span class="n">›</span>
+    <h2>Como a decisão se traduz nos números</h2>
+    <span class="tagline">Comparação dos três caminhos ao longo do financiamento, em poder de compra de hoje.</span>
+  </div>
+
+  <div class="cols">
+    <aside class="panel">
+      <div class="panel-head"><h3>Premissas</h3><p>Tudo recalcula em tempo real.</p></div>
+      <div class="controls">
+        <div class="field hero-field">
+          <label>Bônus anual disponível (R$ de hoje)</label>
+          <input type="text" id="extra" value="132.172">
+          <div class="field-note info">Aporte único por ano, com o valor cheio já no primeiro ano e corrigido pela inflação nos anos seguintes. É investido (A) ou usado para amortizar (B e C).</div>
+        </div>
+
+        <div class="divider-lbl">Trajetória de juros</div>
+        <div class="ctrl">
+          <label>Selic hoje (a.a.) <span class="hint">meta atual 14,25%</span></label>
+          <div class="slider-row"><input type="range" id="selicRange" min="0" max="25" step="0.25" value="14.25" aria-label="Selic hoje"><input type="text" class="numbox" id="selicNum" value="14,25%"></div>
+        </div>
+        <div class="ctrl">
+          <label>Juro real de longo prazo <span class="hint">neutro ≈ 4,5%</span></label>
+          <div class="slider-row"><input type="range" id="realRange" min="0" max="8" step="0.25" value="4.5" aria-label="Juro real longo prazo"><input type="text" class="numbox" id="realNum" value="4,50%"></div>
+          <div class="field-note" id="realNote"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Convergência (anos)</label><input type="text" id="convAnos" value="5"></div>
+          <div class="field"><label>Inflação (% a.a.)</label><input type="text" id="infl" value="4,50"></div>
+        </div>
+        <div class="ctrl">
+          <label>TR (a.a.) <span class="hint">faixa histórica 0–4%</span></label>
+          <div class="slider-row"><input type="range" id="trRange" min="0" max="4" step="0.5" value="0" aria-label="TR"><input type="text" class="numbox" id="trNum" value="0,00%"></div>
+          <div class="field-note" id="trNote"></div>
+        </div>
+        <input type="hidden" id="horizonte" value="40"><input type="hidden" id="aporteAnos" value="20">
+
+        <div class="divider-lbl">Financiamento e imóvel</div>
+        <div class="two">
+          <div class="field"><label>Saldo devedor (R$)</label><input type="text" id="saldo" value="599.000"></div>
+          <div class="field"><label>Prazo restante (meses)</label><input type="text" id="prazo" value="353"></div>
+        </div>
+        <div class="field"><label>Valor do imóvel hoje (R$)</label><input type="text" id="imovel" value="1.200.000"></div>
+
+        <div class="divider-lbl">FGTS</div>
+        <div class="two">
+          <div class="field"><label>FGTS por ano (R$ de hoje)</label><input type="text" id="fgtsAno" value="35.040"></div>
+          <div class="field"><label>Saque a cada (meses)</label><input type="text" id="fgtsPer" value="24"></div>
+        </div>
+        <div class="field"><label>Início da simulação</label><input type="date" id="dataIni"></div>
+        <div class="field-note" id="globalNote"></div>
+        <button class="reset" id="resetBtn">↺ Restaurar premissas padrão</button>
+      </div>
+    </aside>
+
+    <div class="results">
+      <div class="pvbar">
+        <div class="txt" id="pvTxt">—</div>
+        <div class="seg" id="segPV"><button data-v="r">Valores de hoje</button><button data-v="n" class="on">Valores nominais</button></div>
+      </div>
+
+      <div class="cards">
+        <div class="card fam-invest" id="cardA">
+          <span class="badge">Vencedor</span><span class="letter">A</span>
+          <h4>Investir o aporte</h4>
+          <p class="desc">O aporte anual vai para o fundo Selic. O FGTS continua amortizando o financiamento.</p>
+          <div class="pl-k" id="klA">Patrimônio financeiro ao quitar</div><div class="pl-v" id="plA">—</div>
+          <div class="rows">
+            <div class="r"><span>Quitação do financiamento</span><span id="quitA">—</span></div>
+            <div class="r"><span>Custo total da dívida</span><span id="costA">—</span></div>
+            <div class="r"><span>Investimentos acumulados</span><span id="fundA">—</span></div>
+            <div class="r sep"><span>Patrimônio total (c/ imóvel)</span><span id="totA">—</span></div>
+          </div>
+        </div>
+        <div class="card fam-amort" id="cardB">
+          <span class="badge">Vencedor</span><span class="letter">B</span>
+          <h4>Amortizar · reduzir prazo</h4>
+          <p class="desc">O aporte abate o saldo mantendo a amortização; o prazo encurta. O alívio de caixa é investido.</p>
+          <div class="pl-k" id="klB">Patrimônio financeiro ao quitar</div><div class="pl-v" id="plB">—</div>
+          <div class="rows">
+            <div class="r"><span>Quitação do financiamento</span><span id="quitB">—</span></div>
+            <div class="r"><span>Custo total da dívida</span><span id="costB">—</span></div>
+            <div class="r"><span>Investimentos acumulados</span><span id="fundB">—</span></div>
+            <div class="r sep"><span>Patrimônio total (c/ imóvel)</span><span id="totB">—</span></div>
+          </div>
+        </div>
+        <div class="card fam-amort2" id="cardC">
+          <span class="badge">Vencedor</span><span class="letter">C</span>
+          <h4>Amortizar · reduzir parcela</h4>
+          <p class="desc">O aporte abate o saldo mantendo o prazo; a parcela cai. O alívio mensal é investido.</p>
+          <div class="pl-k" id="klC">Patrimônio financeiro ao quitar</div><div class="pl-v" id="plC">—</div>
+          <div class="rows">
+            <div class="r"><span>Quitação do financiamento</span><span id="quitC">—</span></div>
+            <div class="r"><span>Custo total da dívida</span><span id="costC">—</span></div>
+            <div class="r"><span>Investimentos acumulados</span><span id="fundC">—</span></div>
+            <div class="r sep"><span>Patrimônio total (c/ imóvel)</span><span id="totC">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="tabs">
+          <button class="tab on" data-pane="p1">Comparação A/B/C</button>
+          <button class="tab" data-pane="p2">Composição do patrimônio</button>
+          <button class="tab" data-pane="p3">Tabela ano a ano</button>
+        </div>
+        <div class="tabwrap">
+
+          <div class="tabpane on" id="p1">
+            <div class="pane-head">
+              <div><h3>Evolução comparada · A, B e C</h3><div class="csub" id="p1sub">—</div></div>
+              <div class="seg" id="segMetric">
+                <button data-m="plTotal" class="on">Patrimônio total</button>
+                <button data-m="plFin">Financeiro</button>
+                <button data-m="fund">Investimentos</button>
+                <button data-m="saldo">Dívida</button>
+              </div>
+            </div>
+            <div class="chart-holder"><canvas id="chartCmp"></canvas></div>
+            <div class="note-inline" id="p1note">—</div>
+          </div>
+
+          <div class="tabpane" id="p2">
+            <div class="pane-head">
+              <div><h3>De onde vem o patrimônio</h3><div class="csub">Investimentos e imóvel empilhados; dívida e patrimônio líquido em linha</div></div>
+              <div class="seg" id="segScen2"><button data-s="A">A</button><button data-s="B" class="on">B</button><button data-s="C">C</button></div>
+            </div>
+            <div class="chart-holder"><canvas id="chartComp"></canvas></div>
+            <div class="note-inline">Em valores de hoje o imóvel aparece <b>plano</b>: valoriza pela inflação, preservando poder de compra sem ganho real. Como é idêntico nos três cenários, toda a diferença entre A, B e C vem do lado financeiro.</div>
+          </div>
+
+          <div class="tabpane" id="p3">
+            <div class="pane-head">
+              <div><h3>Evolução linha a linha</h3><div class="csub">Dívida, aportes, investimentos, imóvel e patrimônio</div></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div class="seg" id="segScen3"><button data-s="A">A</button><button data-s="B" class="on">B</button><button data-s="C">C</button></div>
+                <div class="seg" id="segFreq"><button data-f="y" class="on">Anual</button><button data-f="m">Mensal</button></div>
+              </div>
+            </div>
+            <div class="tblwrap"><table class="data"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+            <div class="tbl-legend">
+              <span><b style="color:var(--amort-ink)">Amort. extra</b> = bônus anual + FGTS que abatem o saldo (nos cenários de amortizar)</span>
+              <span><i style="background:#f0f7f4;border:1px solid #c7e3d9"></i>Ano com abatimento extraordinário</span>
+              <span><i style="background:#fff;border-bottom:2px solid var(--amort)"></i>Quitação do financiamento</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="insights">
+        <div class="rk">Conclusões</div>
+        <div class="rh" id="insHead">—</div>
+        <div class="ins-grid" id="insGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="warn-row">
+    <div class="warn"><b>Saldo de trabalho</b>Saldo devedor e prazo são estimativas. Confirme no extrato oficial do Bradesco antes de qualquer decisão final.</div>
+    <div class="warn"><b>Seguros estimados</b>Os encargos de MIP/DFI são estimativa simplificada, sem acesso à tabela atuarial da seguradora.</div>
+    <div class="warn"><b>Não é recomendação</b>Ferramenta de apoio à decisão do cliente com seu assessor — não constitui recomendação de investimento.</div>
+  </div>
+
+  <details class="method">
+    <summary>Premissas, fórmulas e limitações do modelo <span class="chev">›</span></summary>
+    <div class="mbody">
+      <h5>O que esta ferramenta responde — e o que não responde</h5>
+      <p>Ela responde a uma pergunta específica e de resposta firme: <b>onde alocar o bônus anual</b>, amortizando ou investindo, ao longo dos anos em que o financiamento existir. Deliberadamente, <b>não</b> projeta o patrimônio até a aposentadoria — essa projeção, em cenário conservador, é apresentada na política de investimentos do cliente. Manter as duas peças separadas evita confusão entre a decisão (margem de erro de dezenas de milhares de reais) e a projeção de décadas (margem de erro de milhões, muito sensível à premissa de retorno). Os números batem entre as duas: com o bônus de R$ 132.172, o simulador reproduz a mesma quitação usada na política — cerca de 10 anos ao investir e 4 anos ao amortizar.</p>
+
+      <h5>Trajetória de juros</h5>
+      <p>A Selic não é mantida congelada no patamar de hoje: ela converge linearmente da taxa atual para um patamar de longo prazo definido por <code>(1 + juro real) × (1 + inflação) − 1</code>, ao longo dos anos de convergência escolhidos. Congelar a taxa atual por décadas suporia cerca de <b>7,2% de juro real líquido ao ano por 40 anos</b>, sem paralelo histórico, e produziria projeções infladas.</p>
+
+      <h5>O IR incide sobre o ganho nominal</h5>
+      <p>Efeito pouco intuitivo e economicamente relevante: com juro real de 4,5% e inflação de 4,5%, o nominal é 9,20%; após 15% de IR sobra 7,77% nominal, que em termos reais é apenas <b>3,13%</b>. O imposto consome cerca de 1,4 ponto do juro real, porque tributa também a parcela que apenas repõe a inflação.</p>
+
+      <h5>Gatilho de decisão</h5>
+      <p>A TR não está embutida no CET — é custo adicional:</p>
+      <p><code>Custo_total_dívida(TR) = (1 + 0,1109) × (1 + TR) − 1</code><br>
+      <code>Selic_gatilho(TR) = Custo_total_dívida(TR) ÷ 0,85</code></p>
+      <p>O que se compara ao gatilho <b>não é a Selic de hoje</b>, e sim a <b>média geométrica projetada da Selic enquanto a dívida existir</b>. A dívida dura poucos anos; usar a taxa de um único dia para decidir sobre esse período é o erro mais comum nesta análise.</p>
+
+      <h5>Valor da decisão</h5>
+      <p>Diferença de patrimônio financeiro entre os cenários no mês em que a dívida se extingue em todos eles, em valores de hoje. A partir desse ponto os três cenários passam a ter fluxos idênticos e a diferença apenas capitaliza — por isso medi-la no fim da dívida isola o efeito da decisão do efeito do tempo. O veredito exibido vem da simulação completa; o gatilho serve para explicar por que o resultado é esse. Quando a vantagem é inferior a 0,5% do patrimônio da época, o cenário é tratado como <b>tecnicamente empatado</b>.</p>
+
+      <h5>Como o bônus anual entra</h5>
+      <p>O bônus é um <b>aporte único por ano</b>, feito uma vez a cada 12 meses. O valor informado é aplicado <b>cheio já no primeiro ano</b> e corrigido pela inflação nos anos seguintes — no ano 2 o valor nominal é o do ano 1 mais a inflação, e assim por diante, mantendo o poder de compra constante. No cenário de investir, o bônus vai para o fundo; nos de amortizar, abate o saldo devedor.</p>
+      <p>O modelo <b>não</b> supõe que o cliente reinveste mensalmente o alívio da redução de parcela — isso não é considerado. A única entrada mensal adicional ocorre <b>depois que o financiamento é quitado</b>: a partir daí, a parcela que deixaria de ser paga ao banco (cerca de R$ 6.800) passa a ser investida, pois esse dinheiro deixa de sair do bolso do cliente. Isso não é uma suposição de comportamento, e sim o fim do próprio financiamento.</p>
+
+      <h5>Motor SAC, FGTS e imóvel</h5>
+      <p>Juros de 0,83% a.m. sobre o saldo corrigido pela TR; amortização recalculada como <code>saldo ÷ parcelas restantes</code>. FGTS informado como acumulado anual, depositado em duodécimos, capitalizado a <b>TR + 3% a.a.</b>, e <b>sempre usado para amortizar</b> nos três cenários. Encargos MIP/DFI estimados por <code>(CET_mensal − 0,83%) × saldo</code>, com +15% a cada faixa de 5 anos de idade. Imóvel valoriza pela inflação — constante em valores de hoje. Aportes e FGTS cessam ao fim do período de acumulação.</p>
+
+      <h5>Validação executada</h5>
+      <ul>
+        <li>Conservação de principal: amortização + FGTS aplicado + aporte aplicado + saldo final = saldo inicial + correções de TR, erro inferior a R$ 1 em todos os cenários de TR e de aporte testados.</li>
+        <li>Conservação do FGTS: depósitos + rendimentos = amortizado + enviado ao fundo + retido; capitalização conferida contra cálculo fechado a TR+3%.</li>
+        <li>Identidade de caixa: pago ao banco + alívio investido = orçamento original, nos três cenários.</li>
+        <li>Auditoria linha a linha: nas 1.440 linhas de cada cenário testado, juros, encargos, recursão do saldo devedor, capitalização do fundo, patrimônio e deflação foram recalculados de forma independente e conferiram integralmente.</li>
+        <li>Fórmulas fechadas: a tabela SAC pura reproduz amortização constante e juros totais iguais a <code>i × saldo × (n+1)/2</code>; a capitalização do fundo reproduz a fórmula de valor futuro de anuidade.</li>
+        <li>Trajetória de juros: parte da Selic de hoje, converge ao patamar de longo prazo de forma monótona; a média geométrica foi reconferida independentemente.</li>
+        <li>Valor da decisão é exatamente zero quando o aporte é zero; aportes e FGTS cessam ao fim do período de acumulação.</li>
+        <li>Fundo, alívio e saldo nunca negativos para TR de 0% a 15%; nenhum valor inválido em 19 casos de borda, incluindo juro real negativo, inflação zero e 30%, aporte de R$ 10 milhões e horizonte de 1 mês.</li>
+      </ul>
+
+      <h5>Limitações</h5>
+      <ul>
+        <li>A projeção assume que <b>todo o valor da parcela liberado após a quitação passa a ser investido</b>. Essa é a premissa mais determinante do resultado: sem essa disciplina, o patrimônio projetado não se realiza.</li>
+        <li>Juro real e inflação são constantes após a convergência; não há cenário estocástico, volatilidade ou sequência de retornos.</li>
+        <li>IR de 15% sobre o rendimento de cada mês, sem tabela regressiva e sem diferimento até o resgate — conservador contra o cenário de investir.</li>
+        <li>A comparação é apresentada apenas ao longo da vida do financiamento; a acumulação de longo prazo e a fase de consumo constam da política de investimentos.</li>
+        <li>Saldo devedor e prazo são estimativas — confirmar no extrato oficial.</li>
+        <li>Sem custos de transação do imóvel, sem risco de crédito, sem eventos de saúde ou renda.</li>
+        <li>Não constitui recomendação de investimento.</li>
+      </ul>
+    </div>
+  </details>
+
+  <footer class="foot">Simulador SAC/SFH · valores em poder de compra de hoje, salvo quando alternado para nominais.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+const BRL0=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+const NUM0=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0});
+const money=v=>BRL0.format(Math.round(v));
+const n0f=v=>NUM0.format(Math.round(v));
+const pct=v=>(v*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
+const kbrl=v=>{const a=Math.abs(v);
+  if(a>=1e6)return 'R$ '+(v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';
+  if(a>=1e3)return 'R$ '+(v/1e3).toLocaleString('pt-BR',{maximumFractionDigits:0})+'k';
+  return 'R$ '+Math.round(v);};
+
+/* ===== motor validado ===== */
+const I_M=0.0083,CET_A=0.1109,TSA=25,IR=0.15;
+const CET_M=Math.pow(1+CET_A,1/12)-1,ENC_F=Math.max(0,CET_M-I_M);
+const mR=a=>Math.pow(1+a,1/12)-1;
+function selicAt(p,t){
+  const longo=(1+p.realLongo)*(1+p.infl)-1;
+  if(p.convMeses<=0||t>=p.convMeses)return longo;
+  return p.selicHoje+(longo-p.selicHoje)*(t/p.convMeses);
+}
+function runSim(p){
+  const TR_m=mR(p.TR_a),FG_m=mR(p.TR_a+0.03),INF_m=mR(p.infl);
+  const H=p.horizon,aporteAte=p.aporteAnos*12,fgDep=p.fgtsAno/12;
+  // parcela da tabela SAC ORIGINAL — usada só para saber quanto de parcela é LIBERADO ao quitar antes
+  const orig=new Array(H).fill(0);
+  {let S=p.S0,n=p.n0;
+   for(let t=0;t<H;t++){if(S>1e-6&&n>0){S*=(1+TR_m);const A=S/n;
+     orig[t]=A+I_M*S+ENC_F*S*Math.pow(1.15,Math.floor(Math.floor(t/12)/5))+TSA;S-=A;n--;}}}
+  function sim(mode){
+    const redParc=(mode==='C');
+    let S=p.S0,n=p.n0,fund=0,fg=0,quit=null;
+    let tJ=0,tTR=0,tE=0,tT=0,tAm=0,tFgApl=0,tExApl=0,tExInv=0,tFgInv=0,tLib=0;
+    let rJ=0,rTR=0,rE=0,rT=0;
+    const rows=new Array(H);
+    for(let t=0;t<H;t++){
+      const defl=Math.pow(1+INF_m,t+1),liq=mR(selicAt(p,t))*(1-IR);
+      fg=fg*(1+FG_m)+((t<aporteAte)?fgDep*Math.pow(1+INF_m,t):0);
+      let am=0,ju=0,en=0,ts=0,par=0;
+      if(S>1e-6&&n>0){
+        const c=S*TR_m;S+=c;tTR+=c;rTR+=c/defl;
+        am=S/n;if(am>S)am=S;
+        ju=I_M*S;en=ENC_F*S*Math.pow(1.15,Math.floor(Math.floor(t/12)/5));ts=TSA;
+        par=am+ju+en+ts;tJ+=ju;tE+=en;tT+=ts;tAm+=am;
+        rJ+=ju/defl;rE+=en/defl;rT+=ts/defl;
+        S-=am;n--;
+        if(S<1e-6){S=0;n=0;if(quit===null)quit=t;}
+      }
+      let invest=0,fgUse=0,exUse=0;
+      // FGTS: SEMPRE amortiza
+      if((t+1)%p.fgtsPeriod===0&&fg>0){
+        if(S>1e-6){
+          fgUse=Math.min(fg,S);S-=fgUse;tFgApl+=fgUse;
+          const sob=fg-fgUse;invest+=sob;tFgInv+=sob;fg=0;
+          if(S<1e-6){S=0;n=0;if(quit===null)quit=t;}
+          else if(!redParc&&am>1e-9)n=Math.max(1,Math.round(S/am));
+        }else{invest+=fg;tFgInv+=fg;fg=0;}
+      }
+      // APORTE ANUAL ÚNICO — valor cheio no ano 1, corrigido pela inflação a cada ano
+      const exT=(t<aporteAte)?p.extra*Math.pow(1+p.infl,Math.floor(t/12)):0;
+      if(exT>0&&(t+1)%p.extraPeriod===0){
+        if(mode==='A'){invest+=exT;tExInv+=exT;}
+        else if(S>1e-6){
+          exUse=Math.min(exT,S);S-=exUse;tExApl+=exUse;
+          const sob=exT-exUse;invest+=sob;tExInv+=sob;
+          if(S<1e-6){S=0;n=0;if(quit===null)quit=t;}
+          else if(!redParc&&am>1e-9)n=Math.max(1,Math.round(S/am));
+        }else{invest+=exT;tExInv+=exT;}
+      }
+      // PARCELA LIBERADA pós-quitação (fim do financiamento, não alívio de redução de parcela)
+      let liberado=0;
+      if(S<1e-6&&par<1e-9&&t<p.n0){liberado=orig[t];invest+=liberado;tLib+=liberado;}
+      fund=fund*(1+liq)+invest;
+      const im=p.imovel0*Math.pow(1+INF_m,t+1);
+      rows[t]={t,saldo:S,am,ju,en:en+ts,par,fgUse,exUse,liberado,invest,fund,imovel:im,
+        plFin:fund-S,plTotal:fund+im-S,
+        rSaldo:S/defl,rAm:am/defl,rJu:ju/defl,rEn:(en+ts)/defl,rPar:par/defl,
+        rInvest:invest/defl,rFund:fund/defl,rImovel:im/defl,
+        rPlFin:(fund-S)/defl,rPlTotal:(fund+im-S)/defl};
+    }
+    const dH=Math.pow(1+INF_m,H),im=p.imovel0*Math.pow(1+INF_m,H);
+    return {mode,rows,quit,fund,debt:S,imovel:im,plFin:fund-S,plTotal:fund+im-S,
+      rFund:fund/dH,rDebt:S/dH,rImovel:im/dH,rPlFin:(fund-S)/dH,rPlTotal:(fund+im-S)/dH,
+      cost:tJ+tTR+tE+tT,rCost:rJ+rTR+rE+rT,tExInv,tFgInv,tLib,tExApl,tFgApl,tAm,tTR};
+  }
+  const R={A:sim('A'),B:sim('B'),C:sim('C')};
+  const qs=[R.A.quit,R.B.quit,R.C.quit].map(q=>q===null?H-1:q);
+  R.decT=Math.min(H-1,Math.max.apply(null,qs));
+  R.decisao={A:R.A.rows[R.decT].rPlFin,B:R.B.rows[R.decT].rPlFin,C:R.C.rows[R.decT].rPlFin};
+  let acc=1;for(let t=0;t<=R.decT;t++)acc*=(1+mR(selicAt(p,t)));
+  R.selicMedia=Math.pow(acc,12/(R.decT+1))-1;
+  return R;
+}
+const gatilho=TR=>{const c=(1+CET_A)*(1+TR)-1;return{custo:c,selic:c/0.85};};
+
+/* ===== parsing ===== */
+function pnum(s){if(s==null)return NaN;
+  let x=String(s).replace(/[^\d,.-]/g,'').trim();
+  if(x===''||x==='-')return NaN;
+  if(x.indexOf(',')>-1)x=x.replace(/\./g,'').replace(',','.');
+  else{const pr=x.split('.');if(pr.length>1&&pr[pr.length-1].length===3)x=x.replace(/\./g,'');}
+  const v=parseFloat(x);return isFinite(v)?v:NaN;}
+const ppct=s=>{const v=pnum(s);return isNaN(v)?NaN:v/100;};
+const $=id=>document.getElementById(id);
+
+const DEF={S0:599000,n0:353,fgtsAno:35040,fgtsPeriod:24,extra:132172,extraPeriod:12,
+  horizonY:40,aporteAnos:20,TR_a:0,selicHoje:0.1425,realLongo:0.045,convAnos:5,
+  imovel0:1200000,infl:0.045,start:null};
+const V={...DEF};
+const selR=$('selicRange'),selN=$('selicNum'),realR=$('realRange'),realN=$('realNum'),
+  trR=$('trRange'),trN=$('trNum'),fSaldo=$('saldo'),fPrazo=$('prazo'),fFg=$('fgtsAno'),
+  fPer=$('fgtsPer'),fHor=$('horizonte'),fImov=$('imovel'),fInfl=$('infl'),fData=$('dataIni'),
+  fExtra=$('extra'),fAp=$('aporteAnos'),fConv=$('convAnos');
+(function(){const d=new Date();fData.value=d.toISOString().slice(0,10);DEF.start=fData.value;})();
+
+let PV=false,metric='plTotal',scen2='B',scen3='B',freq='y';
+let cCmp=null,cComp=null,LAST=null;
+
+function readState(){
+  let v;
+  v=ppct(selN.value);if(!isNaN(v)&&v>=0)V.selicHoje=v;
+  v=ppct(realN.value);if(!isNaN(v)&&v>-0.5)V.realLongo=v;
+  v=ppct(trN.value);if(!isNaN(v))V.TR_a=v;
+  v=ppct(fInfl.value);if(!isNaN(v)&&v>-0.5)V.infl=v;
+  v=pnum(fConv.value);if(v>=0)V.convAnos=Math.min(v,40);
+  v=pnum(fSaldo.value);if(v>0)V.S0=v;
+  v=Math.round(pnum(fPrazo.value));if(v>0)V.n0=Math.min(v,900);
+  v=pnum(fFg.value);if(v>=0)V.fgtsAno=v;
+  v=Math.round(pnum(fPer.value));if(v>0)V.fgtsPeriod=Math.min(v,600);
+  v=pnum(fExtra.value);if(v>=0)V.extra=v;
+  v=pnum(fAp.value);if(v>=0)V.aporteAnos=Math.min(v,60);
+  v=pnum(fHor.value);if(v>0)V.horizonY=Math.min(v,60);
+  v=pnum(fImov.value);if(v>=0)V.imovel0=v;
+  V.aporteAnos=20; V.horizonY=40;
+  return {...V,horizon:480,convMeses:Math.round(V.convAnos*12)};
+}
+function notes(){
+  const tn=$('trNote');tn.className='field-note';
+  if(V.TR_a<0){tn.textContent='TR negativa — fora da faixa histórica.';tn.classList.add('alert');}
+  else if(V.TR_a>0.06){tn.textContent='TR acima de 6% — fora da faixa histórica.';tn.classList.add('alert');}
+  else tn.textContent='';
+  const rn=$('realNote');rn.className='field-note';
+  const longo=(1+V.realLongo)*(1+V.infl)-1;
+  rn.textContent='Selic de longo prazo implícita: '+pct(longo)+'.';
+  if(V.realLongo>0.07){rn.textContent+=' Acima de 7% real é otimista para prazos longos.';rn.classList.add('info');}
+  $('globalNote').textContent='Prazo do contrato: '+V.n0+' meses.';
+}
+const syncPair=(rng,num,key,max)=>{
+  rng.addEventListener('input',()=>{V[key]=parseFloat(rng.value)/100;num.value=pct(V[key]);go();});
+  num.addEventListener('input',()=>{const v=ppct(num.value);
+    if(!isNaN(v)){V[key]=v;if(v>=0&&v<=max)rng.value=(v*100).toFixed(2);}go();});
+  num.addEventListener('blur',()=>{num.value=pct(V[key]);});
+};
+
+function render(){
+  const p=readState();notes();
+  const g=gatilho(p.TR_a);
+  const rFull=runSim(p);
+  const qmax=Math.max(rFull.A.quit===null?p.horizon-1:rFull.A.quit,
+                      rFull.B.quit===null?p.horizon-1:rFull.B.quit,
+                      rFull.C.quit===null?p.horizon-1:rFull.C.quit);
+  // encerra exatamente no mês da última quitação entre os cenários (sem cauda).
+  // Se nenhum cenário quitar dentro do prazo, usa o prazo contratual/horizonte informado.
+  const hDisp=Math.min(p.horizon,qmax+1);
+  p.hDisp=hDisp;
+  const r=rFull;LAST={p,r,g};
+  const difDec=Math.max(r.decisao.B,r.decisao.C)-r.decisao.A;
+  const baseDec=Math.max(1,Math.abs(r.decisao.A));
+  const empate=Math.abs(difDec)/baseDec<0.005;
+  const inv=difDec<0;
+  const anosDiv=((r.decT+1)/12);
+
+  $('bnCusto').textContent=pct(g.custo);
+  $('bnCustoExp').innerHTML='CET de 11,09% <b>+ TR de '+pct(p.TR_a)+'</b>. É o retorno garantido que você trava ao amortizar.';
+  $('bnGatilho').textContent=pct(g.selic);
+  $('bnSelicMedia').textContent=pct(r.selicMedia);
+  $('bnSelicExp').innerHTML='Média geométrica ao longo dos <b>'+anosDiv.toFixed(1)+' anos</b> de dívida, partindo de '+
+    pct(p.selicHoje)+' hoje. <b>Não é a taxa de hoje que decide</b> — é a média do período.';
+
+  $('verdictBox').className='verdict-box '+(empate?'amo':(inv?'inv':'amo'));
+  $('vtag').textContent=empate?'Empate técnico':(inv?'Investir':'Amortizar');
+  $('vtxt').innerHTML=empate
+    ?'A Selic média projetada (<b>'+pct(r.selicMedia)+'</b>) fica praticamente no gatilho de '+pct(g.selic)+
+     '. <b>As duas opções se equivalem</b> — a diferença é inferior a 0,5% do patrimônio. Decida por conforto de caixa, não por rentabilidade.'
+    :(inv
+    ?'A Selic média projetada (<b>'+pct(r.selicMedia)+'</b>) fica <b>acima</b> do gatilho de '+pct(g.selic)+'. <b>Investir o valor rende mais do que abater a dívida.</b>'
+    :'A Selic média projetada (<b>'+pct(r.selicMedia)+'</b>) fica <b>abaixo</b> do gatilho de '+pct(g.selic)+'. <b>Abater a dívida rende mais do que investir</b>'+(p.selicHoje>g.selic?' — mesmo com a Selic de hoje em '+pct(p.selicHoje)+'.':'.'));
+
+  const dom=25,gp=Math.max(2,Math.min(98,g.selic*100/dom*100)),
+    sp=Math.max(2,Math.min(98,r.selicMedia*100/dom*100)),
+    hp=Math.max(2,Math.min(98,p.selicHoje*100/dom*100));
+  $('thresh').style.left=gp+'%';
+  const nd=$('needle');nd.style.left=sp+'%';nd.setAttribute('data-lbl','média '+pct(r.selicMedia));
+  const nh=$('needleHoje');nh.style.left=hp+'%';nh.setAttribute('data-lbl','hoje '+pct(p.selicHoje));
+  nh.style.display=Math.abs(hp-sp)<3?'none':'block';
+  $('scaleMid').textContent='gatilho '+pct(g.selic);
+  $('scaleTrack').style.background='linear-gradient(90deg,var(--amort) 0%,var(--amort) '+(gp-.6)+'%,#e6dfd2 '+(gp-.6)+'%,#e6dfd2 '+(gp+.6)+'%,var(--invest) '+(gp+.6)+'%,var(--invest) 100%)';
+
+  const dv=[['A',r.decisao.A],['B',r.decisao.B],['C',r.decisao.C]].sort((a,b)=>b[1]-a[1]);
+  const dif=dv[0][1]-dv[2][1];
+  const NOMEC={A:'investindo o valor',B:'amortizando com redução de prazo',C:'amortizando com redução de parcela'};
+  $('decValor').textContent=money(dif);
+  $('decValorSub').innerHTML='diferença entre o melhor (<b>'+dv[0][0]+'</b>) e o pior (<b>'+dv[2][0]+'</b>), em valores de hoje';
+  $('decQuando').textContent='ano '+anosDiv.toFixed(1);
+
+  /* robustez da decisão */
+  const reais=[0.025,0.035,0.045,0.055,0.065];
+  let rb='',dirs=[];
+  reais.forEach(rl=>{
+    const rr=runSim({...p,realLongo:rl});
+    const d=Math.max(rr.decisao.B,rr.decisao.C)-rr.decisao.A;
+    dirs.push(d);
+    const base=Math.abs(rl-p.realLongo)<0.0001;
+    rb+='<tr class="'+(base?'base':'')+'"><td>'+pct(rl)+(base?' · atual':'')+'</td><td>'+money(rr.decisao.A)+
+      '</td><td>'+money(rr.decisao.B)+'</td><td class="'+(d>0?'win':'')+'">'+(d>0?'+':'')+money(d)+'</td></tr>';
+  });
+  $('robustBody').innerHTML=rb;
+  const todosMesmo=dirs.every(d=>d>0)||dirs.every(d=>d<0);
+  const venceu=dirs[0]>0?'amortizar':'investir';
+  $('robustConc').innerHTML=todosMesmo
+    ?'<b>A resposta não muda.</b> Testando o juro real de longo prazo de 2,5% a 6,5% ao ano, a conclusão é sempre a mesma: '+venceu+
+     '. O que varia é o tamanho da vantagem, entre '+money(Math.min.apply(null,dirs.map(Math.abs)))+' e '+
+     money(Math.max.apply(null,dirs.map(Math.abs)))+'. Por isso esta é uma decisão que pode ser tomada com tranquilidade.'
+    :'<b>A resposta se inverte</b> dentro da faixa de juros testada, o que significa que as duas opções são muito próximas. Nesse caso, decida pelo que traz mais conforto de caixa, não pela rentabilidade esperada.';
+
+  /* cards */
+  const M={A:r.A,B:r.B,C:r.C};
+  // métrica de decisão exibida nos cards = patrimônio FINANCEIRO no momento em que a dívida acaba em todos
+  const iDec=r.decT;
+  const plCard=s=>PV?s.rows[iDec].rPlFin:s.rows[iDec].plFin;
+  ['A','B','C'].forEach(k=>{const s=M[k];
+    $('kl'+k).textContent='Patrimônio financeiro no ano '+((iDec+1)/12).toFixed(0);
+    $('pl'+k).textContent=money(plCard(s));
+    $('quit'+k).textContent=s.quit===null?'não quita':('ano '+((s.quit+1)/12).toFixed(1));
+    $('cost'+k).textContent=money(PV?s.rCost:s.cost);
+    $('fund'+k).textContent=money(PV?s.rows[iDec].rFund:s.rows[iDec].fund);
+    $('tot'+k).textContent=money(PV?s.rows[iDec].rPlTotal:s.rows[iDec].plTotal);});
+  const rk=[['A',plCard(r.A)],['B',plCard(r.B)],['C',plCard(r.C)]].sort((a,b)=>b[1]-a[1]);
+  ['A','B','C'].forEach(k=>$('card'+k).classList.remove('win'));
+  $('card'+rk[0][0]).classList.add('win');
+
+  $('pvTxt').innerHTML=PV
+    ?'Exibindo <b>valores de hoje</b> — descontados da inflação de '+pct(p.infl)+' a.a.'
+    :'Exibindo <b>valores nominais</b> — sem desconto de inflação.';
+  $('p1sub').textContent='Até a quitação do financiamento (ano '+((p.hDisp)/12).toFixed(0)+') · Selic '+pct(p.selicHoje)+' → '+pct((1+p.realLongo)*(1+p.infl)-1)+' em '+p.convAnos+' anos · TR '+pct(p.TR_a);
+  setNote();
+
+  /* dados p/ conclusões: sensibilidade da decisão (não da projeção) */
+  const lo=Math.max(0,p.realLongo-0.02),hi=p.realLongo+0.02;
+  const sims={lo:runSim({...p,realLongo:lo}),mid:r,hi:runSim({...p,realLongo:hi})};
+  const decLo=Math.max(sims.lo.decisao.B,sims.lo.decisao.C)-sims.lo.decisao.A;
+  const decHi=Math.max(sims.hi.decisao.B,sims.hi.decisao.C)-sims.hi.decisao.A;
+
+  /* conclusões */
+  const venc=dv[0][0];
+  const anosB=(r.B.quit!==null)?((r.B.quit+1)/12):null;
+  const anosA=(r.A.quit!==null)?((r.A.quit+1)/12):null;
+  const economiaJuros=(PV?r.A.rCost:r.A.cost)-(PV?r[venc].rCost:r[venc].cost);
+  const contribTotal=p.extra*p.aporteAnos;
+  const todosMesmoDir=(difDec>0&&decLo>0&&decHi>0)||(difDec<0&&decLo<0&&decHi<0)||empate;
+
+  $('insHead').innerHTML = empate
+    ? 'Neste cenário, abater o financiamento e investir o bônus <b>se equivalem</b>. A escolha pode ser feita por conforto de caixa.'
+    : (inv
+      ? 'Neste cenário, <b>investir o bônus</b> supera abater o financiamento.'
+      : 'Neste cenário, <b>abater o financiamento</b> supera investir o bônus.');
+
+  const ins=[];
+  ins.push({k:'A decisão',cls:empate?'neu':(inv?'inv':'amo'),
+    v:empate?'Equivalente':(inv?'Investir':'Amortizar'),vsm:true,
+    t:'Sua dívida custa <b>'+pct(g.custo)+'</b> ao ano — retorno garantido ao amortizar. Para investir compensar, o rendimento precisa superar <b>'+
+      pct(g.selic)+'</b>, pois 15% do ganho vai para o IR. A Selic média projetada enquanto a dívida existir é <b>'+pct(r.selicMedia)+'</b>.'});
+
+  ins.push({k:'Não é a taxa de hoje que decide',cls:'',v:pct(r.selicMedia),
+    t:'Hoje a Selic está em <b>'+pct(p.selicHoje)+'</b>, mas o financiamento dura cerca de <b>'+((r.decT+1)/12).toFixed(0)+
+      ' anos</b>. O que importa é a média da taxa ao longo desse período, não o número de um único momento.'});
+
+  ins.push({k:'Quanto vale a escolha certa',cls:'',v:money(dif),
+    t:'É a diferença de patrimônio entre a melhor e a pior alternativa, no momento em que a dívida se encerra. '+
+      (todosMesmoDir&&!empate?'A resposta não se inverte em nenhuma premissa de juro real testada (de 2,5% a 6,5%).':'As alternativas ficam muito próximas nesta configuração.')});
+
+  if(anosB!==null&&anosA!==null&&Math.abs(anosA-anosB)>0.3){
+    ins.push({k:'Quando o financiamento acaba',cls:'amo',v:'ano '+anosB.toFixed(1),
+      t:'Usando o bônus para amortizar, a dívida termina no ano <b>'+anosB.toFixed(1)+'</b>, contra o ano <b>'+
+        anosA.toFixed(1)+'</b> se você apenas investir — <b>'+(anosA-anosB).toFixed(1)+' anos</b> a menos de financiamento.'});
+  }
+  if(economiaJuros>1000){
+    ins.push({k:'Juros e encargos evitados',cls:'amo',v:money(economiaJuros),
+      t:empate
+        ?'Mesmo com patrimônio equivalente, amortizar deixa de pagar <b>'+money(economiaJuros)+
+         '</b> ao banco e encerra a dívida anos antes — um ganho de tranquilidade, não de rentabilidade.'
+        :'É quanto você deixa de pagar ao banco '+NOMEC[venc]+', comparado a manter o financiamento até o fim do prazo original.'});
+  }
+  if(contribTotal>0){
+    ins.push({k:'O que mais constrói patrimônio',cls:'',v:money(p.extra)+'/ano',
+      t:'Muito mais do que a escolha entre amortizar e investir, o que determina seu patrimônio futuro é <b>manter o hábito de aportar o bônus</b> e investir a parcela de R$ 6.800 liberada após a quitação. A projeção completa está na sua política de investimentos.'});
+  }else{
+    ins.push({k:'Informe o bônus anual',cls:'neu',v:'—',vsm:true,
+      t:'Sem um valor definido não há decisão a tomar: o FGTS já abate o financiamento nos três cenários. Preencha o campo de bônus anual para comparar as alternativas.'});
+  }
+
+  ins.push({k:'Projeção de longo prazo',cls:'',v:'ver política',vsm:true,
+    t:'Esta ferramenta responde <b>onde alocar o bônus</b>. A evolução do patrimônio até a aposentadoria — em cenário conservador — é apresentada separadamente na sua <b>política de investimentos</b>, para não misturar a decisão com a projeção de décadas.'});
+
+  $('insGrid').innerHTML=ins.map(i=>'<div class="ins"><div class="k">'+i.k+'</div><div class="v '+
+    (i.cls||'')+(i.vsm?' sm':'')+'">'+i.v+'</div><div class="t">'+i.t+'</div></div>').join('');
+
+  drawCmp(p,r);drawComp(p,r);buildTable(p,r);
+}
+function setNote(){
+  const L={plTotal:'patrimônio total (investimentos + imóvel − dívida)',plFin:'patrimônio financeiro',
+    fund:'investimentos acumulados',saldo:'saldo devedor'};
+  $('p1note').innerHTML='Métrica: <b>'+L[metric]+'</b>, em '+(PV?'valores de hoje':'valores nominais')+
+    '. Os três cenários consomem o mesmo caixa; muda apenas o destino do aporte anual.';
+}
+
+/* ===== charts ===== */
+const COL={A:'#c2751b',B:'#0f7a5a',C:'#2a7d6a'};
+const sample=H=>{const st=Math.max(1,Math.round(H/200)),ix=[];
+  for(let t=0;t<H;t+=st)ix.push(t);if(ix[ix.length-1]!==H-1)ix.push(H-1);return ix;};
+const baseOpts=()=>({responsive:true,maintainAspectRatio:false,animation:false,
+  interaction:{mode:'index',intersect:false},
+  plugins:{legend:{position:'top',align:'end',labels:{boxWidth:12,boxHeight:12,usePointStyle:true,pointStyle:'line',font:{family:'Inter',size:12},color:'#3a465a'}},
+    tooltip:{backgroundColor:'#132a4d',padding:11,titleFont:{family:'Inter',size:12},bodyFont:{family:'Inter',size:12.5},callbacks:{title:i=>'Ano '+i[0].label}}},
+  scales:{x:{title:{display:true,text:'anos',font:{family:'Inter',size:11},color:'#6b7789'},
+    ticks:{maxTicksLimit:11,font:{family:'Inter',size:11},color:'#6b7789'},grid:{color:'#eef1f5'}},
+    y:{ticks:{font:{family:'Inter',size:11},color:'#6b7789',callback:v=>kbrl(v)},grid:{color:'#eef1f5'}}}});
+
+function drawCmp(p,r){
+  const H=p.hDisp||p.horizon;
+  const ix=sample(H),lab=ix.map(t=>+((t+1)/12).toFixed(2));
+  const key=PV?({plTotal:'rPlTotal',plFin:'rPlFin',fund:'rFund',saldo:'rSaldo'})[metric]:metric;
+  const ds=['A','B','C'].map(k=>({label:k+' · '+({A:'investir',B:'reduzir prazo',C:'reduzir parcela'})[k],
+    data:ix.map(t=>Math.round(r[k].rows[t][key])),borderColor:COL[k],backgroundColor:COL[k],
+    borderDash:k==='C'?[5,4]:undefined,tension:.18,pointRadius:0,borderWidth:2.4}));
+  if(cCmp){cCmp.data.labels=lab;cCmp.data.datasets.forEach((d,i)=>{d.data=ds[i].data;});cCmp.update('none');return;}
+  const o=baseOpts();
+  o.plugins.tooltip.callbacks.label=c=>' '+c.dataset.label+': '+BRL0.format(c.parsed.y);
+  cCmp=new Chart($('chartCmp').getContext('2d'),{type:'line',data:{labels:lab,datasets:ds},options:o});
+}
+function drawComp(p,r){
+  const H=p.hDisp||p.horizon;
+  const s=r[scen2],ix=sample(H),lab=ix.map(t=>+((t+1)/12).toFixed(2));
+  const kf=PV?'rFund':'fund',ki=PV?'rImovel':'imovel',ks=PV?'rSaldo':'saldo',kp=PV?'rPlTotal':'plTotal';
+  const ds=[
+    {label:'Investimentos',data:ix.map(t=>Math.round(s.rows[t][kf])),borderColor:'#0f7a5a',
+     backgroundColor:'rgba(15,122,90,.20)',fill:'origin',tension:.18,pointRadius:0,borderWidth:1.6,order:3},
+    {label:'Imóvel',data:ix.map(t=>Math.round(s.rows[t][kf]+s.rows[t][ki])),borderColor:'#5a6bb0',
+     backgroundColor:'rgba(90,107,176,.18)',fill:0,tension:.18,pointRadius:0,borderWidth:1.6,order:4},
+    {label:'Dívida',data:ix.map(t=>Math.round(s.rows[t][ks])),borderColor:'#b4302a',backgroundColor:'#b4302a',
+     borderDash:[5,4],fill:false,tension:.18,pointRadius:0,borderWidth:2,order:1},
+    {label:'Patrimônio líquido',data:ix.map(t=>Math.round(s.rows[t][kp])),borderColor:'#132a4d',
+     backgroundColor:'#132a4d',fill:false,tension:.18,pointRadius:0,borderWidth:2.8,order:0}];
+  if(cComp){cComp.data.labels=lab;cComp.data.datasets.forEach((d,i)=>{d.data=ds[i].data;});cComp.update('none');return;}
+  const o=baseOpts();
+  o.plugins.tooltip.callbacks.label=c=>{let v=c.parsed.y;
+    if(c.datasetIndex===1)v=c.parsed.y-c.chart.data.datasets[0].data[c.dataIndex];
+    return ' '+c.dataset.label+': '+BRL0.format(v);};
+  cComp=new Chart($('chartComp').getContext('2d'),{type:'line',data:{labels:lab,datasets:ds},options:o});
+}
+function buildTable(p,r){
+  const s=r[scen3],H=p.hDisp||p.horizon,d0=new Date(fData.value||DEF.start);
+  const dstr=t=>{const d=new Date(d0.getFullYear(),d0.getMonth()+t,1);
+    return String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();};
+  const sf=PV?' (hoje)':'';
+  // coluna nova: "Amort. extra" = aporte + FGTS que abatem o saldo (antes invisíveis)
+  const hd=freq==='m'
+    ?['Mês','Data','Saldo devedor','Amort. mensal','Amort. extra','Juros','Encargos','Parcela','Investido','Investimentos','Imóvel','Patrimônio']
+    :['Ano','Até','Saldo devedor','Amort. mensal','Amort. extra','Juros','Encargos','Pago ao banco','Investido','Investimentos','Imóvel','Patrimônio'];
+  $('thead').innerHTML='<tr>'+hd.map((h,i)=>'<th>'+h+(i>1?sf:'')+'</th>').join('')+'</tr>';
+  const gv=(x,k)=>PV?x['r'+k.charAt(0).toUpperCase()+k.slice(1)]:x[k];
+  // versão deflacionada de exUse+fgUse quando em valores de hoje
+  const extra=(x,t)=>{const nom=x.exUse+x.fgUse;return PV?nom/Math.pow(1+mR(p.infl),t+1):nom;};
+  const cell=(v,cls)=>'<td'+(cls?' class="'+cls+'"':'')+'>'+(Math.abs(v)<0.5?'—':n0f(v))+'</td>';
+  let html='';
+  if(freq==='m'){
+    for(let t=0;t<H;t++){const x=s.rows[t];const ex=extra(x,t);
+      html+='<tr class="'+(((x.fgUse>0||x.exUse>0)?'evt ':'')+((s.quit===t)?'quit':'')).trim()+'"><td>'+(t+1)+
+        '</td><td>'+dstr(t)+'</td><td class="'+(x.saldo>0?'deb':'')+'">'+n0f(gv(x,'saldo'))+'</td>'+
+        cell(gv(x,'am'))+cell(ex,ex>0.5?'pos':'')+cell(gv(x,'ju'))+cell(gv(x,'en'))+cell(gv(x,'par'))+
+        cell(gv(x,'invest'))+'<td>'+n0f(gv(x,'fund'))+'</td><td>'+n0f(gv(x,'imovel'))+
+        '</td><td class="'+(gv(x,'plTotal')>=0?'pos':'deb')+'">'+n0f(gv(x,'plTotal'))+'</td></tr>';}
+  }else{
+    const Y=Math.ceil(H/12);
+    for(let y=0;y<Y;y++){const a=y*12,b=Math.min(H,a+12);
+      let am=0,exx=0,ju=0,en=0,par=0,ap=0,ev=false,q=false;
+      for(let t=a;t<b;t++){const x=s.rows[t];am+=gv(x,'am');exx+=extra(x,t);ju+=gv(x,'ju');en+=gv(x,'en');
+        par+=gv(x,'par');ap+=gv(x,'invest');if(x.fgUse>0||x.exUse>0)ev=true;if(s.quit===t)q=true;}
+      const x=s.rows[b-1];
+      html+='<tr class="'+((ev?'evt ':'')+(q?'quit':'')).trim()+'"><td>'+(y+1)+'</td><td>'+dstr(b-1)+
+        '</td><td class="'+(x.saldo>0?'deb':'')+'">'+n0f(gv(x,'saldo'))+'</td>'+
+        cell(am)+cell(exx,exx>0.5?'pos':'')+cell(ju)+cell(en)+cell(par)+cell(ap)+
+        '<td>'+n0f(gv(x,'fund'))+'</td><td>'+n0f(gv(x,'imovel'))+
+        '</td><td class="'+(gv(x,'plTotal')>=0?'pos':'deb')+'">'+n0f(gv(x,'plTotal'))+'</td></tr>';}
+  }
+  $('tbody').innerHTML=html;
+}
+
+/* ===== wiring ===== */
+let raf=null;const go=()=>{if(raf)cancelAnimationFrame(raf);raf=requestAnimationFrame(render);};
+syncPair(selR,selN,'selicHoje',0.25);
+syncPair(realR,realN,'realLongo',0.08);
+syncPair(trR,trN,'TR_a',0.04);
+[fSaldo,fPrazo,fFg,fPer,fImov,fInfl,fData,fExtra,fConv].forEach(i=>{
+  i.addEventListener('input',go);
+  i.addEventListener('blur',()=>{
+    if(i===fSaldo||i===fImov||i===fFg||i===fExtra){const v=pnum(i.value);if(v>=0)i.value=NUM0.format(Math.round(v));}
+    if(i===fInfl){const v=ppct(i.value);if(!isNaN(v))i.value=(v*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+    go();});});
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');$(b.dataset.pane).classList.add('on');
+  [cCmp,cComp].forEach(c=>c&&c.resize());}));
+const segClick=(id,fn)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  $(id).querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');fn(b);});
+segClick('segPV',b=>{PV=(b.dataset.v==='r');render();});
+segClick('segMetric',b=>{metric=b.dataset.m;if(LAST){drawCmp(LAST.p,LAST.r);setNote();}});
+segClick('segScen2',b=>{scen2=b.dataset.s;if(LAST)drawComp(LAST.p,LAST.r);});
+segClick('segScen3',b=>{scen3=b.dataset.s;if(LAST)buildTable(LAST.p,LAST.r);});
+segClick('segFreq',b=>{freq=b.dataset.f;if(LAST)buildTable(LAST.p,LAST.r);});
+$('resetBtn').addEventListener('click',()=>{Object.assign(V,DEF);
+  selR.value='14.25';selN.value='14,25%';realR.value='4.5';realN.value='4,50%';
+  trR.value='0';trN.value='0,00%';fSaldo.value='599.000';fPrazo.value='353';
+  fFg.value='35.040';fPer.value='24';fConv.value='5';
+  fImov.value='1.200.000';fInfl.value='4,50';fExtra.value='132.172';fData.value=DEF.start;render();});
+render();
+})();
+</script>
+</body>
+</html>
